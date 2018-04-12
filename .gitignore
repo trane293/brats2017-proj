@@ -1,0 +1,5 @@
+.idea/
+code/notebooks/.ipynb_checkpoints
+code/*.pyc
+code/*pycache*
+code/*/*.pyc
