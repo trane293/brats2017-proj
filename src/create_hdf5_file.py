@@ -94,23 +94,24 @@ def main():
 
     for dataset_splits in glob.glob(os.path.join(config['data_dir_prefix'], '*')): # Training/Validation data?
         if os.path.isdir(dataset_splits) and 'Validation' in dataset_splits: # make sure its a directory
-            # VALIDATION data handler
-            logger.info('currently loading Validation data.')
-            count = 0
-            # validation data does not have HGG and LGG distinctions
-            for images, pats in dataloader.loadDataGenerator(dataset_splits,
-                                         batch_size=config['batch_size'], loadSurvival=False, csvFilePath=None,
-                                         loadSeg=False, preprocess=PREPROCESS_DATA):
-                hdf5_file['validation_data'][count:count+config['batch_size'],...] = images
-                t = 0
-
-                for i in range(count, count + config['batch_size']):
-                    hdf5_file['validation_data_pat_name'][i] = pats[t].split('/')[-1]
-                    t += 1
-
-                # logger.debug('array equal?: {}'.format(np.array_equal(hdf5_file['validation_data'][count:count+config['batch_size'],...], images)))
-                logger.info('loaded {} patient(s) from {}'.format(count + config['batch_size'], dataset_splits))
-                count += config['batch_size']
+            continue
+            # # VALIDATION data handler
+            # logger.info('currently loading Validation data.')
+            # count = 0
+            # # validation data does not have HGG and LGG distinctions
+            # for images, pats in dataloader.loadDataGenerator(dataset_splits,
+            #                              batch_size=config['batch_size'], loadSurvival=False, csvFilePath=None,
+            #                              loadSeg=False, preprocess=PREPROCESS_DATA):
+            #     hdf5_file['validation_data'][count:count+config['batch_size'],...] = images
+            #     t = 0
+            #
+            #     for i in range(count, count + config['batch_size']):
+            #         hdf5_file['validation_data_pat_name'][i] = pats[t].split('/')[-1]
+            #         t += 1
+            #
+            #     # logger.debug('array equal?: {}'.format(np.array_equal(hdf5_file['validation_data'][count:count+config['batch_size'],...], images)))
+            #     logger.info('loaded {} patient(s) from {}'.format(count + config['batch_size'], dataset_splits))
+            #     count += config['batch_size']
 
         else:
         # TRAINING data handler
