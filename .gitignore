@@ -3,3 +3,7 @@ code/notebooks/.ipynb_checkpoints
 code/*.pyc
 code/*pycache*
 code/*/*.pyc
+src/modules/.ipynb_checkpoints/
+src/modules/__pycache__/
+src/notebooks/.ipynb_checkpoints/
+
