@@ -26,7 +26,7 @@ LICENCE: Proprietary for now.
 from __future__ import print_function
 import glob as glob
 import numpy as np
-import cPickle as pickle
+import pickle
 import sys as sys
 from pandas import read_csv
 import os

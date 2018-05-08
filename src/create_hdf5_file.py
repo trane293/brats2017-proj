@@ -38,6 +38,8 @@ from modules import dataloader
 import logging
 import numpy as np
 import h5py
+import sys
+sys.path.append('../')
 from modules.configfile import config
 
 logging.basicConfig(level=logging.INFO)
