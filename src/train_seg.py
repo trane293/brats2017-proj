@@ -48,7 +48,7 @@ except:
 parser = optparse.OptionParser()
 parser.add_option('--dm', '--defmodelfile',
                   dest="defmodelfile",
-                  default='cnn_patches',
+                  default='3dunet',
                   type='str'
                   )
 
@@ -60,7 +60,7 @@ parser.add_option('--g', '--grade',
 
 parser.add_option('--o', '--out-name',
                   dest="output_name",
-                  default='cnn_patches_default.h5',
+                  default='3dunet_patches.h5',
                   type='str'
                   )
 
@@ -119,10 +119,11 @@ if options.defmodelfile is None:
 modeldefmodule = importlib.import_module('defmodel.'+options.defmodelfile, package=None)
 
 # get the model
-model = modeldefmodule.get_model()
+inp_shape = tuple(config['patch_input_shape'])
+model = modeldefmodule.get_model(inp_shape=inp_shape) # (4, x, y, z)
 
-# compile
-model = modeldefmodule.compile_model(model)
+# # compile
+# model = modeldefmodule.compile_model(model)
 # ======================================================================================
 
 # --------------------------------------------------------------------------------------
@@ -141,7 +142,7 @@ tb = TensorBoard(log_dir='./graph', histogram_freq=0,
 # ======================================================================================
 
 c = 0
-epochs = 1
+epochs = 10
 batch_size = 10
 total_per_epoch_training = (len(train_indices) * config['num_patches_per_patient'] / batch_size)
 total_per_epoch_testing = (len(test_indices) * config['num_patches_per_patient'] / batch_size)
@@ -152,9 +153,9 @@ train_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
 test_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
                                   t_i=test_indices, mean_var=mean_var, batch_size=batch_size)
 
-history = model.fit_generator(train_gen, steps_per_epoch=10,
+history = model.fit_generator(train_gen, steps_per_epoch=total_per_epoch_training,
                     epochs=1, verbose=1, callbacks=[mc, reduceLR, tb],
-                    validation_data=test_gen, validation_steps=10,
+                    validation_data=test_gen, validation_steps=total_per_epoch_testing,
                     class_weight=None, max_queue_size=10, workers=1,
                     use_multiprocessing=True, shuffle=False, initial_epoch=0)
 

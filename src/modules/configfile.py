@@ -71,10 +71,11 @@ config['data_split'] = {'train': 95,
 config['std_scale'] = 4 # scale the standard deviation for path generation process to allow patches from far off regions
 config['num_patches_per_patient'] = 60 # number of patches to generate for a single patient
 config['patch_size'] = [32, 32, 32] # size of patch to extract
+config['patch_input_shape'] = [4] + config['patch_size']
 config['gen_patches_from'] = 'original' # generate patches from the cropped version of the database or original.
 config['validate_on'] = 'original' # Perform validation on original images or cropped images
-config['num_labels'] = 4 # number of labels in the segmentation mask, except background
-
+config['num_labels'] = 3 # number of labels in the segmentation mask, except background
+config['max_label_val'] = 4
 # check the order of data and chose proper data shape to save images
 if config['data_order'] == 'th':
     config['train_shape_hgg'] = (config['train_hgg_patients'], 4, config['spatial_size_for_training'][0], config['spatial_size_for_training'][1], config['num_slices'])

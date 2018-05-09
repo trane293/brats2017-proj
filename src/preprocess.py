@@ -103,6 +103,8 @@ new_group_preprocessed['validation_data_pat_name'][:] = hdf5_file['validation_da
 # ------------------------------------------------------------------------------------
 
 # get the  file  where mean/var values are stored
+# TODO: Use the config file global path, not this one.
+
 saveMeanVarFilename = os.sep.join(config['hdf5_filepath_prefix'].split(os.sep)[0:-1])
 logging.info('starting the Cropping/Normalization process.')
 

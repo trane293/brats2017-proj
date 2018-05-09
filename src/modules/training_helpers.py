@@ -144,6 +144,19 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False):
 
 
 def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False):
+    '''
+    Generate patch batches, apply augmentation, and create multiple masks for multi-class segmentation
+
+    Tested: True
+
+    :param X:
+    :param Y:
+    :param t_i:
+    :param mean_var:
+    :param batch_size:
+    :param debug_mode:
+    :return:
+    '''
     while 1:
         for x_patches, y_patches in generate_patches(X, Y, t_i, mean_var=mean_var, debug_mode=debug_mode):
 
@@ -160,11 +173,13 @@ def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False)
                 y_batch_channel_wise = np.zeros((y_batch.shape[0], config['num_labels'],
                                                  y_batch.shape[1], y_batch.shape[2], y_batch.shape[3]))
 
-                for i in range(0, config['num_labels']):
+                labels = [1,2,4]
+
+                for idx, i in enumerate(labels):
                     # inside the channel 'i' in y_batch_channel_wise, set all voxels which have label 'i' equal to 'i'.
                     # in the zeroth channel, find the voxels which are 1, and set all those corresponding voxels as 1
                     # there's no seperate  channel  for background class.
-                    y_batch_channel_wise[:, i, ...][np.where(y_batch == i + 1)] = 1
+                    y_batch_channel_wise[:, idx, ...][np.where(y_batch == i)] = 1
 
 
                 yield x_batch, y_batch_channel_wise

@@ -5,6 +5,13 @@ from keras.layers import Conv3D, MaxPooling3D, UpSampling3D, Activation, BatchNo
 from keras.optimizers import Adam
 from functools import partial
 from keras import backend as K
+import logging
+
+logging.basicConfig(level=logging.INFO)
+try:
+    logger = logging.getLogger(__file__.split('/')[-1])
+except:
+    logger = logging.getLogger(__name__)
 
 K.set_image_data_format("channels_first")
 
@@ -122,7 +129,12 @@ def unet_model_3d(input_shape, pool_size=(2, 2, 2), n_labels=3, initial_learning
 
     model.compile(optimizer=Adam(lr=initial_learning_rate), loss=dice_coefficient_loss, metrics=metrics)
 
-    return model, dice_coefficient_loss
+    return model
+
+
+def custom_loss():
+    name = 'dice_coefficient_loss'
+    return {name: dice_coefficient_loss}
 
 
 def create_convolution_block(input_layer, n_filters, batch_normalization=False, kernel=(3, 3, 3), activation=None,
@@ -176,7 +188,63 @@ def get_up_convolution(n_filters, pool_size, kernel_size=(2, 2, 2), strides=(2, 
     else:
         return UpSampling3D(size=pool_size)
 
+
+def save_model_with_hyper_and_history(model, history, name=None):
+    import cPickle as pickle
+    filename = name if name != None else "model"
+
+    if '.h5' not in filename:
+        filename_dict = filename + '_hyper_dict.p'
+        filename = filename + '.h5'
+        filename_history = filename + '_history.p'
+    else:
+        filename_dict = filename.split('.')[-2] + '_hyper_dict.p'
+        filename_history = filename.split('.')[-2] + '_history.p'
+
+    logger.info('Saving trained model with name {}'.format(filename))
+    model.save(filename)
+    logger.info('Model save successful!')
+
+    logger.info('Saving history object with name {}'.format(filename_dict))
+    with open(filename_history, "wb") as f:
+        pickle.dump(history.history, f)
+    logger.info('Saved history object!')
+
+
+def open_model_with_hyper_and_history(name=None, custom_obj=None):
+    import cPickle as pickle
+    from keras.models import load_model
+    filename = name if name != None else "model"
+
+    if '.h5' not in filename:
+        filename_dict = filename + '_hyper_dict.p'
+        filename = filename + '.h5'
+        filename_history = filename + '_history.p'
+    else:
+        filename_dict = filename.split('.')[-2] + '_hyper_dict.p'
+        filename_history = filename.split('.')[-2] + '_history.p'
+
+    logger.info('Opening trained model with name {}'.format(filename))
+    model = load_model(filename, custom_objects=custom_obj)
+    logger.info('Model open successful!')
+
+    logger.info('Opening history object with name {}'.format(filename_dict))
+    history = pickle.load(open(filename_history, "rb"))
+    logger.info('Opened history object!')
+
+    return model, history
+
+
+def get_model(inp_shape=(4,32,32,32)):
+    model = unet_model_3d(input_shape=inp_shape, pool_size=(2, 2, 2), n_labels=3, initial_learning_rate=0.00001,
+                          deconvolution=False,
+                          depth=4, n_base_filters=32, include_label_wise_dice_coefficients=True,
+                          metrics=dice_coefficient,
+                          batch_normalization=False, activation_name="sigmoid")
+    return model
+
 if __name__ == '__main__':
     model = unet_model_3d(input_shape=(4, 32, 32, 32), pool_size=(2, 2, 2), n_labels=3, initial_learning_rate=0.00001, deconvolution=False,
                   depth=4, n_base_filters=32, include_label_wise_dice_coefficients=True, metrics=dice_coefficient,
                   batch_normalization=False, activation_name="sigmoid")
+    logger.info('Created the model!')
