@@ -6,4 +6,4 @@ code/*/*.pyc
 src/modules/.ipynb_checkpoints/
 src/modules/__pycache__/
 src/notebooks/.ipynb_checkpoints/
-
+src/*/*.pyc
