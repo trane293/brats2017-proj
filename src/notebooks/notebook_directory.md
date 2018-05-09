@@ -6,4 +6,5 @@
 - `TestContainmentHypothesis.ipynb`
  - Code to check if the BRATS dataset has the containment properties that we're hypothesizing. 
  
- 
+- `TestLineHypothesis.ipynb`
+ - Alternative way to test hypothesis on sample data. Refer to notebook for details. 
