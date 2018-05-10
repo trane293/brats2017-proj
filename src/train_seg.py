@@ -161,7 +161,7 @@ test_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
                                   t_i=test_indices, mean_var=mean_var, batch_size=batch_size)
 
 history = model.fit_generator(train_gen, steps_per_epoch=total_per_epoch_training,
-                    epochs=1, verbose=1, callbacks=[mc, reduceLR, tb],
+                    epochs=epochs, verbose=1, callbacks=[mc, reduceLR, tb],
                     validation_data=test_gen, validation_steps=total_per_epoch_testing,
                     class_weight=None, max_queue_size=10, workers=1,
                     use_multiprocessing=True, shuffle=False, initial_epoch=0)
