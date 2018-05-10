@@ -22,6 +22,24 @@ DESCRIPTION: This file serves the purpose of loading one of
              functions that need to  be defined in it as well.
 LICENCE: Proprietary for now.
 """
+import platform
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+try:
+    logger = logging.getLogger(__file__.split('/')[-1])
+except:
+    logger = logging.getLogger(__name__)
+
+# to make the code portable even on cedar,you need to add conditions here
+node_name = platform.node()
+if node_name == 'XPS15' or 'cs-mial-31' in node_name:
+    # this is my laptop, so the cedar-rm directory is at a different place
+    # disable GPU
+    logger.info('Disabling GPU!')
+    import os
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
+    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # -1 !!!!
 
 import h5py
 import sys
@@ -35,14 +53,8 @@ np.random.seed(1337)
 import importlib
 import optparse
 import os
-import logging
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau, TensorBoard
 
-logging.basicConfig(level=logging.DEBUG)
-try:
-    logger = logging.getLogger(__file__.split('/')[-1])
-except:
-    logger = logging.getLogger(__name__)
 
 
 parser = optparse.OptionParser()
