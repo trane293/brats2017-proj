@@ -146,7 +146,7 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False):
 
 
 def printPercentages(patches):
-    patches_shape = list[np.shape(patches)]
+    patches_shape = [a for a in np.shape(patches)]
 
     k = 1
     for i in patches_shape:
