@@ -64,6 +64,13 @@ parser.add_option('--o', '--out-name',
                   type='str'
                   )
 
+parser.add_option('--e', '--epochs',
+                  dest="epochs",
+                  default=10,
+                  type='int'
+                  )
+
+
 options, remainder = parser.parse_args()
 
 # --------------------------------------------------------------------------------------
@@ -142,7 +149,7 @@ tb = TensorBoard(log_dir='./graph', histogram_freq=0,
 # ======================================================================================
 
 c = 0
-epochs = 10
+epochs = options.epochs
 batch_size = 10
 total_per_epoch_training = (len(train_indices) * config['num_patches_per_patient'] / batch_size)
 total_per_epoch_testing = (len(test_indices) * config['num_patches_per_patient'] / batch_size)

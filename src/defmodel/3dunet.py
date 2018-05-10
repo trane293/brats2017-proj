@@ -65,7 +65,7 @@ dice_coef_loss = dice_coefficient_loss
 
 def unet_model_3d(input_shape, pool_size=(2, 2, 2), n_labels=3, initial_learning_rate=0.00001, deconvolution=False,
                   depth=4, n_base_filters=32, include_label_wise_dice_coefficients=False, metrics=dice_coefficient,
-                  batch_normalization=False, activation_name="sigmoid"):
+                  batch_normalization=False, activation_name="sigmoid", loss_fn=weighted_dice_coefficient_loss):
     """
     Builds the 3D UNet Keras model.f
     :param metrics: List metrics to be calculated during model training (default is dice coefficient).
@@ -127,7 +127,7 @@ def unet_model_3d(input_shape, pool_size=(2, 2, 2), n_labels=3, initial_learning
         else:
             metrics = label_wise_dice_metrics
 
-    model.compile(optimizer=Adam(lr=initial_learning_rate), loss=dice_coefficient_loss, metrics=metrics)
+    model.compile(optimizer=Adam(lr=initial_learning_rate), loss=loss_fn, metrics=metrics)
 
     return model
 
@@ -240,7 +240,7 @@ def get_model(inp_shape=(4,32,32,32)):
                           deconvolution=False,
                           depth=4, n_base_filters=32, include_label_wise_dice_coefficients=True,
                           metrics=dice_coefficient,
-                          batch_normalization=False, activation_name="sigmoid")
+                          batch_normalization=False, activation_name="sigmoid", loss_fn=weighted_dice_coefficient_loss)
     return model
 
 if __name__ == '__main__':

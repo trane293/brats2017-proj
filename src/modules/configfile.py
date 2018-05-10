@@ -68,7 +68,7 @@ config['size_after_cropping'] = [194, 155, 148] # set this if you set the above 
 config['data_split'] = {'train': 95,
                         'test': 5}
 
-config['std_scale'] = 4 # scale the standard deviation for path generation process to allow patches from far off regions
+config['std_scale'] = 10 # scale the standard deviation for path generation process to allow patches from far off regions
 config['num_patches_per_patient'] = 60 # number of patches to generate for a single patient
 config['patch_size'] = [32, 32, 32] # size of patch to extract
 config['patch_input_shape'] = [4] + config['patch_size']
