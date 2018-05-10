@@ -140,7 +140,30 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False):
                     x_patches[_t, ...] = x[t[0]:t[1], t[2]:t[3], t[4]:t[5], :]
                     y_patches[_t, ...] = y[t[0]:t[1], t[2]:t[3], t[4]:t[5]]
 
+            printPercentages(y_patches)
+
             yield x_patches, y_patches
+
+
+def printPercentages(patches):
+    patches_shape = list[np.shape(patches)]
+
+    k = 1
+    for i in patches_shape:
+        k = k * i
+
+    total_pixels = k
+
+    lab = np.bincount(patches)
+
+    # total pixels with label 1
+    logger.info('%age pixels with label 1 = {}'.format((lab[1]*100.0)/total_pixels))
+
+    # total pixels with label 2
+    logger.info('%age pixels with label 2 = {}'.format((lab[2] * 100.0) / total_pixels))
+
+    # total pixels with label 4
+    logger.info('%age pixels with label 3 = {}'.format((lab[3] * 100.0) / total_pixels))
 
 
 def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False):
