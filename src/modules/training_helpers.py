@@ -154,16 +154,20 @@ def printPercentages(patches):
 
     total_pixels = k
 
-    lab = np.bincount(patches)
-
     # total pixels with label 1
-    logger.info('%age pixels with label 1 = {}'.format((lab[1]*100.0)/total_pixels))
+    lab = np.where(patches == 1)
+    lab = lab1[0].shape[0]
+    logger.info('%age pixels with label 1 = {}'.format((lab*100.0)/total_pixels))
 
     # total pixels with label 2
-    logger.info('%age pixels with label 2 = {}'.format((lab[2] * 100.0) / total_pixels))
+    lab = np.where(patches == 2)
+    lab = lab[0].shape[0]
+    logger.info('%age pixels with label 2 = {}'.format((lab * 100.0) / total_pixels))
 
     # total pixels with label 4
-    logger.info('%age pixels with label 3 = {}'.format((lab[3] * 100.0) / total_pixels))
+    lab = np.where(patches == 4)
+    lab = lab[0].shape[0]
+    logger.info('%age pixels with label 3 = {}'.format((lab * 100.0) / total_pixels))
 
 
 def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False):
