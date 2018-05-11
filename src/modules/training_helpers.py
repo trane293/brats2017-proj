@@ -114,7 +114,7 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False):
         prefix = '[Testing]'
 
     while 1:
-        logger.debug(prefix + ' Iteration over all patient data starts')
+        logger.info(prefix + ' Iteration over all patient data starts')
         for _enum, t_idx in enumerate(t_i):
             logger.debug(prefix + ' Generating patches from Patient ID = {}, num = {}'.format(t_idx, _enum))
 
