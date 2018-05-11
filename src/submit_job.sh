@@ -1,1 +1,1 @@
-sbatch run_job.sh > curr_run.txt
+sbatch run_job.sh &> curr_run.txt

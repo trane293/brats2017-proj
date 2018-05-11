@@ -7,3 +7,11 @@ src/modules/.ipynb_checkpoints/
 src/modules/__pycache__/
 src/notebooks/.ipynb_checkpoints/
 src/*/*.pyc
+defmodel/__init__.pyc
+modules/__init__.pyc
+modules/configfile.pyc
+modules/training_helpers.pyc
+../environment_cedar.yml
+curr_run.txt
+slurm-7874868.out
+
