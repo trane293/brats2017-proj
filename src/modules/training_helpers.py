@@ -3,7 +3,7 @@ from configfile import config
 from scipy.ndimage.measurements import _stats
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 try:
     logger = logging.getLogger(__file__.split('/')[-1])
 except:
@@ -174,17 +174,17 @@ def printPercentages(patches):
     # total pixels with label 1
     lab = np.where(patches == 1)
     lab = lab[0].shape[0]
-    logger.info('%age pixels with label 1 (Necrotic + Non-Enhancing) = {}'.format((lab*100.0)/total_pixels))
+    logger.debug('%age pixels with label 1 (Necrotic + Non-Enhancing) = {}'.format((lab*100.0)/total_pixels))
 
     # total pixels with label 2
     lab = np.where(patches == 2)
     lab = lab[0].shape[0]
-    logger.info('%age pixels with label 2 (Edema) = {}'.format((lab * 100.0) / total_pixels))
+    logger.debug('%age pixels with label 2 (Edema) = {}'.format((lab * 100.0) / total_pixels))
 
     # total pixels with label 4
     lab = np.where(patches == 4)
     lab = lab[0].shape[0]
-    logger.info('%age pixels with label 4 (Enhancing) = {}'.format((lab * 100.0) / total_pixels))
+    logger.debug('%age pixels with label 4 (Enhancing) = {}'.format((lab * 100.0) / total_pixels))
 
 
 def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False):
