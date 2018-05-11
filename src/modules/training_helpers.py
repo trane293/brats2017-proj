@@ -17,10 +17,10 @@ def center_of_mass(input, labels=None, index=None):
     results = [sum(input * grids[dir].astype(float), labels, index) / normalizer
                for dir in range(input.ndim)]
 
-    if numpy.isscalar(results[0]):
+    if np.isscalar(results[0]):
         return tuple(results)
 
-    return [tuple(v) for v in numpy.array(results).T]
+    return [tuple(v) for v in np.array(results).T]
 
 
 def apply_mean_std(im, mean_var):
