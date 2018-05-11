@@ -1,6 +1,6 @@
 import numpy as np
 from configfile import config
-# from scipy.ndimage.measurements import center_of_mass
+from scipy.ndimage.measurements import center_of_mass
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -9,18 +9,21 @@ try:
 except:
     logger = logging.getLogger(__name__)
 
-
-def center_of_mass(input, labels=None, index=None):
-    normalizer = sum(input, labels, index)
-    grids = np.ogrid[[slice(0, i) for i in input.shape]]
-
-    results = [sum(input * grids[dir].astype(float), labels, index) / normalizer
-               for dir in range(input.ndim)]
-
-    if np.isscalar(results[0]):
-        return tuple(results)
-
-    return [tuple(v) for v in np.array(results).T]
+# def sum(input, labels=None, index=None):
+#     count, sum = _stats(input, labels, index)
+#     return sum
+#
+# def center_of_mass(input, labels=None, index=None):
+#     normalizer = sum(input, labels, index)
+#     grids = np.ogrid[[slice(0, i) for i in input.shape]]
+#
+#     results = [sum(input * grids[dir].astype(float), labels, index) / normalizer
+#                for dir in range(input.ndim)]
+#
+#     if np.isscalar(results[0]):
+#         return tuple(results)
+#
+#     return [tuple(v) for v in np.array(results).T]
 
 
 def apply_mean_std(im, mean_var):
