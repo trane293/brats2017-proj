@@ -45,6 +45,14 @@ parser.add_option('--vo', '--validate-on',
                   type='str'
                   )
 
+
+parser.add_option('--mn', '--model-name',
+                  dest="model_name",
+                  default='/home/anmol/mounts/cedar-rm/scratch/asa224/model-checkpoints/3dunet_patches.h502--0.24.h5',
+                  type='str'
+                  )
+
+
 options, remainder = parser.parse_args()
 
 if options.output_name is None:
@@ -108,7 +116,7 @@ new_hdf5['validation_data_pat_name'][:] = hdf5_file_g['validation_data_pat_name'
 
 modeldefmodule = importlib.import_module('defmodel.' + options.defmodelfile, package=None)
 custom_objs = modeldefmodule.custom_loss()
-model, params, history = modeldefmodule.open_model_with_hyper_and_history(name=options.output_name, custom_obj=custom_objs)
+model, params, history = modeldefmodule.open_model_with_hyper_and_history(name=options.model_name, custom_obj=custom_objs)
 # =====================================================================================
 
 # -------------------------------------------------------------------------------------

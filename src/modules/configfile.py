@@ -45,7 +45,7 @@ config['saveMeanVarFilepathHGG'] = os.path.join(os.sep.join(config['hdf5_filepat
 config['saveMeanVarFilepathLGG'] = os.path.join(os.sep.join(config['hdf5_filepath_prefix'].split(os.sep)[0:-1]), 'BRATS2018_HDF5_Datasetstraining_data_lgg_mean_var.p')
 config['model_snapshot_location'] = os.path.join(mount_path_prefix, 'scratch/asa224/model-snapshots/')
 config['model_checkpoint_location'] = os.path.join(mount_path_prefix, 'scratch/asa224/model-checkpoints/')
-config['model_prediction_location'] = os.path.join(mount_path_prefix, '/scratch/asa224/model-predictions/')
+config['model_prediction_location'] = os.path.join(mount_path_prefix, 'scratch/asa224/model-predictions/')
 # # IF YOU PERFORM PREPROCESSING, THESE VARIABLES ARE TO BE CHANGED. DEFAULT VALUES ARE:
 # config['spatial_size_for_training'] = (240, 240) # If any preprocessing is done, then this needs to change. This is the shape of data that you want to train with. If you are changing this that means you did some preprocessing.
 # config['num_slices'] = 155 # number of slices in input data. THIS SHOULD CHANGE AS WELL WHEN PERFORMING PREPROCESSING
