@@ -25,7 +25,7 @@ LICENCE: Proprietary for now.
 import platform
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 try:
     logger = logging.getLogger(__file__.split('/')[-1])
 except:
