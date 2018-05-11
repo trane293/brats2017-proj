@@ -70,7 +70,7 @@ config['data_split'] = {'train': 95,
 
 config['std_scale'] = 3 # scale the standard deviation for path generation process to allow patches from far off regions
 config['num_patches_per_patient'] = 60 # number of patches to generate for a single patient
-config['patch_size'] = [32, 32, 32] # size of patch to extract
+config['patch_size'] = [64, 64, 64] # size of patch to extract
 config['patch_input_shape'] = [4] + config['patch_size']
 config['gen_patches_from'] = 'original' # generate patches from the cropped version of the database or original.
 config['validate_on'] = 'original' # Perform validation on original images or cropped images
