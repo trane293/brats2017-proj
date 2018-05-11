@@ -30,7 +30,7 @@ if node_name == 'XPS15':
     # this is my laptop, so the cedar-rm directory is at a different place
     mount_path_prefix = '/home/anmol/mounts/cedar-rm/'
 elif 'computecanada' in node_name: # we're in compute canada, maybe in an interactive node, or a scheduler node.
-    mount_path_prefix = '$HOME' # home directory
+    mount_path_prefix = '/home/asa224/' # home directory
 else:
     # this is probably my workstation or TS server
     mount_path_prefix = '/local-scratch/cedar-rm/'
