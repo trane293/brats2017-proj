@@ -80,6 +80,12 @@ parser.add_option('--e', '--epochs',
                   type='int'
                   )
 
+parser.add_option('--b', '--batch-size',
+                  dest="batch_size",
+                  default=10,
+                  type='int'
+                  )
+
 
 options, remainder = parser.parse_args()
 
@@ -160,7 +166,7 @@ tb = TensorBoard(log_dir='./graph', histogram_freq=0,
 
 c = 0
 epochs = options.epochs
-batch_size = 10
+batch_size = options.batch_size
 total_per_epoch_training = (len(train_indices) * config['num_patches_per_patient'] / batch_size)
 total_per_epoch_testing = (len(test_indices) * config['num_patches_per_patient'] / batch_size)
 
