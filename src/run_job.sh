@@ -6,7 +6,7 @@
 #SBATCH --time=48:00:00
 #SBATCH --job-name=train_seg.py
 #SBATCH --account=rrg-hamarneh
-#SBATCH --mem=128000M
+#SBATCH --mem=126000M
 #SBATCH --mail-user=asa224@sfu.ca
 #SBATCH --mail-type=ALL
 echo "Creating new folder in shared memory space at the node"
