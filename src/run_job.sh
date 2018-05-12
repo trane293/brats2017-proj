@@ -3,10 +3,10 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24    # There are 24 CPU cores on Cedar GPU nodes
 #SBATCH --gres=gpu:lgpu:4     # Ask for 4 GPUs per node of the large-gpu node variety
-#SBATCH --time=02:00:00
+#SBATCH --time=2-12:00
 #SBATCH --job-name=train_seg.py
 #SBATCH --account=rrg-hamarneh
-#SBATCH --mem=256000M
+#SBATCH --mem=128000M
 #SBATCH --mail-user=asa224@sfu.ca
 #SBATCH --mail-type=ALL
 echo "Creating new folder in shared memory space at the node"
@@ -22,4 +22,3 @@ pip freeze
 echo "hello"
 which python
 python train_seg.py --epochs 40 --batch-size 2 --hdf5 /dev/shm/asa224/BRATS2018.h5
-
