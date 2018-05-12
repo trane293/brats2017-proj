@@ -86,6 +86,11 @@ parser.add_option('--b', '--batch-size',
                   type='int'
                   )
 
+parser.add_option('--h', '--hdf5',
+                  dest="hdf5_filepath",
+                  default=None,
+                  type='str'
+                  )
 
 options, remainder = parser.parse_args()
 
@@ -102,7 +107,11 @@ if config['gen_patches_from'] == 'cropped':
     hdf5_file = h5py.File(config['hdf5_filepath_cropped'], mode='r')
     hdf5_file_g = hdf5_file['preprocessed']
 else:
-    hdf5_file = h5py.File(config['hdf5_filepath_prefix'], mode='r')
+    if options.hdf5_filepath != None:
+        logger.info('Using supplied HDF5 Filepath {}'.format(options.hdf5_filepath))
+        hdf5_file = h5py.File(options.hdf5_filepath, mode='r')
+    else:
+        hdf5_file = h5py.File(config['hdf5_filepath_prefix'], mode='r')
     hdf5_file_g = hdf5_file['original_data']
 
 # get all the HGG/LGG data
