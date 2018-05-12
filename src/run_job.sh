@@ -2,8 +2,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24    # There are 24 CPU cores on Cedar GPU nodes
-#SBATCH --gres=gpu:lgpu:4     # Ask for 4 GPUs per node of the large-gpu node variety
-#SBATCH --time=2-12:00
+#SBATCH --gres=gpu:gpu:4     # Ask for 4 GPUs per node of the large-gpu node variety
+#SBATCH --time=48:00:00
 #SBATCH --job-name=train_seg.py
 #SBATCH --account=rrg-hamarneh
 #SBATCH --mem=128000M
