@@ -189,7 +189,7 @@ test_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
 history = model.fit_generator(train_gen, steps_per_epoch=total_per_epoch_training,
                     epochs=epochs, verbose=1, callbacks=[mc, reduceLR, tb],
                     validation_data=test_gen, validation_steps=total_per_epoch_testing,
-                    class_weight=None, max_queue_size=20, workers=10,
+                    class_weight=None, max_queue_size=100, workers=1,
                     use_multiprocessing=True, shuffle=False, initial_epoch=0)
 
 modeldefmodule.save_model_with_hyper_and_history(model, history=history, name=options.output_name)
