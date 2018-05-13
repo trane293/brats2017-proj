@@ -6,6 +6,7 @@ from keras.optimizers import Adam
 from functools import partial
 from keras import backend as K
 import logging
+from keras.utils import multi_gpu_model
 
 logging.basicConfig(level=logging.INFO)
 try:
@@ -127,6 +128,9 @@ def unet_model_3d(input_shape, pool_size=(2, 2, 2), n_labels=3, initial_learning
         else:
             metrics = label_wise_dice_metrics
 
+    logger.warn('Compiling a MULTI GPU MODEL')
+    model = multi_gpu_model(model, gpus=4)
+    logger.warn('Done compiling!')
     model.compile(optimizer=Adam(lr=initial_learning_rate), loss=loss_fn, metrics=metrics)
 
     return model

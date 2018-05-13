@@ -54,7 +54,6 @@ import importlib
 import optparse
 import os
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau, TensorBoard
-from keras.utils import multi_gpu_model
 
 parser = optparse.OptionParser()
 parser.add_option('--dm', '--defmodelfile',
@@ -155,10 +154,9 @@ modeldefmodule = importlib.import_module('defmodel.'+options.defmodelfile, packa
 # inp_shape = tuple(config['patch_input_shape'])
 inp_shape = (4, None, None, None)
 model = modeldefmodule.get_model(inp_shape=inp_shape) # (4, x, y, z)
-model = multi_gpu_model(model, gpus=4)
 
-# compile
-model = modeldefmodule.compile_model(model)
+# # compile
+# model = modeldefmodule.compile_model(model)
 # ======================================================================================
 
 # --------------------------------------------------------------------------------------
