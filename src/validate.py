@@ -21,7 +21,7 @@ except:
 parser = optparse.OptionParser()
 parser.add_option('--dm', '--defmodelfile',
                   dest="defmodelfile",
-                  default='cnn_patches',
+                  default='3dunet',
                   type='str'
                   )
 
@@ -34,7 +34,7 @@ parser.add_option('--g', '--grade',
 
 parser.add_option('--o', '--out-name',
                   dest="output_name",
-                  default='cnn_patches_v1.h5',
+                  default='3dunet',
                   type='str'
                   )
 
@@ -48,7 +48,7 @@ parser.add_option('--vo', '--validate-on',
 
 parser.add_option('--mn', '--model-name',
                   dest="model_name",
-                  default='/home/anmol/mounts/cedar-rm/scratch/asa224/model-checkpoints/3dunet_patches.h502--0.24.h5',
+                  default='/home/anmol/mounts/cedar-rm/scratch/asa224/model-checkpoints/3d_unet_old_checkpoints_uncompleted_job/3dunet_patches.h525--0.21.h5',
                   type='str'
                   )
 
@@ -116,7 +116,7 @@ new_hdf5['validation_data_pat_name'][:] = hdf5_file_g['validation_data_pat_name'
 
 modeldefmodule = importlib.import_module('defmodel.' + options.defmodelfile, package=None)
 custom_objs = modeldefmodule.custom_loss()
-model, params, history = modeldefmodule.open_model_with_hyper_and_history(name=options.model_name, custom_obj=custom_objs)
+model = modeldefmodule.open_model_with_hyper_and_history(name=options.model_name, custom_obj=custom_objs, load_model_only=True)
 # =====================================================================================
 
 # -------------------------------------------------------------------------------------

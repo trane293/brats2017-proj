@@ -132,9 +132,14 @@ def unet_model_3d(input_shape, pool_size=(2, 2, 2), n_labels=3, initial_learning
     return model
 
 
-def custom_loss():
-    name = 'dice_coefficient_loss'
-    return {name: dice_coefficient_loss}
+def custom_loss(n_labels=3):
+    name = 'weighted_dice_coefficient_loss'
+    label_wise_dice_metrics = [get_label_dice_coefficient_function(index) for index in range(n_labels)]
+    metrics_dict = {func.__name__: func for func in label_wise_dice_metrics}
+
+    metrics_dict[name] = weighted_dice_coefficient_loss
+    metrics_dict['dice_coefficient'] = dice_coefficient
+    return metrics_dict
 
 
 def create_convolution_block(input_layer, n_filters, batch_normalization=False, kernel=(3, 3, 3), activation=None,
@@ -211,7 +216,7 @@ def save_model_with_hyper_and_history(model, history, name=None):
     logger.info('Saved history object!')
 
 
-def open_model_with_hyper_and_history(name=None, custom_obj=None):
+def open_model_with_hyper_and_history(name=None, custom_obj=None, load_model_only=False):
     import cPickle as pickle
     from keras.models import load_model
     filename = name if name != None else "model"
@@ -227,12 +232,13 @@ def open_model_with_hyper_and_history(name=None, custom_obj=None):
     logger.info('Opening trained model with name {}'.format(filename))
     model = load_model(filename, custom_objects=custom_obj)
     logger.info('Model open successful!')
+    if load_model_only == False:
+        logger.info('Opening history object with name {}'.format(filename_dict))
+        history = pickle.load(open(filename_history, "rb"))
+        logger.info('Opened history object!')
+        return model, history
 
-    logger.info('Opening history object with name {}'.format(filename_dict))
-    history = pickle.load(open(filename_history, "rb"))
-    logger.info('Opened history object!')
-
-    return model, history
+    return model
 
 
 def get_model(inp_shape=(4,32,32,32)):
