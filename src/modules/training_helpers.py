@@ -89,7 +89,7 @@ def calculateCOM_STD(segmask):
     return [m_x, m_y, m_z], [std_x, std_y, std_z]
 
 
-def generate_patches(X, Y, t_i, mean_var, debug_mode=False):
+def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training'):
     """
     Generator for generating patches to train. Make sure you specify samples_per_epoch in the
     Keras fit_generator function to num_patient * num_patches. That will ensure that the training
@@ -108,10 +108,7 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False):
     x_patches = np.empty(config['numpy_patch_size'])
     y_patches = np.empty((config['num_patches_per_patient'], config['patch_size'][0], config['patch_size'][1],
                          config['patch_size'][2]))
-    if len(t_i) > 50:  # a very ad-hoc way of knowing this is probably called for training generation
-        prefix = '[Training]'
-    elif len(t_i) <= 50:  # a very ad-hoc way of knowing this is probably called for training generation
-        prefix = '[Testing]'
+    prefix = '[' + gen_name + ']'
 
     while 1:
         logger.info(prefix + ' Iteration over all patient data starts')
@@ -187,7 +184,7 @@ def printPercentages(patches):
     logger.debug('%age pixels with label 4 (Enhancing) = {}'.format((lab * 100.0) / total_pixels))
 
 
-def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False):
+def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False, gen_name='Training'):
     '''
     Generate patch batches, apply augmentation, and create multiple masks for multi-class segmentation
 
@@ -202,7 +199,7 @@ def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False)
     :return:
     '''
     while 1:
-        for x_patches, y_patches in generate_patches(X, Y, t_i, mean_var=mean_var, debug_mode=debug_mode):
+        for x_patches, y_patches in generate_patches(X, Y, t_i, mean_var=mean_var, debug_mode=debug_mode, gen_name=gen_name):
 
             for _t in range(0, x_patches.shape[0], batch_size):
                 # add augmentation code here
