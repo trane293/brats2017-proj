@@ -111,9 +111,9 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training')
     prefix = '[' + gen_name + ']'
 
     while 1:
-        logger.info(prefix + ' Iteration over all patient data starts')
+        logger.warn(prefix + ' Iteration over all patient data starts')
         for _enum, t_idx in enumerate(t_i):
-            logger.debug(prefix + ' Generating patches from Patient ID = {}, num = {}'.format(t_idx, _enum))
+            logger.info(prefix + ' Generating patches from Patient ID = {}, num = {}'.format(t_idx, _enum))
 
             x = apply_mean_std(X[t_idx], mean_var)
             y = Y[t_idx]
