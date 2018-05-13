@@ -250,7 +250,7 @@ def get_model(inp_shape=(4,32,32,32)):
     return model
 
 if __name__ == '__main__':
-    model = unet_model_3d(input_shape=(4, 32, 32, 32), pool_size=(2, 2, 2), n_labels=3, initial_learning_rate=0.00001, deconvolution=False,
+    model = unet_model_3d(input_shape=(4, None, None, None), pool_size=(2, 2, 2), n_labels=3, initial_learning_rate=0.00001, deconvolution=True,
                   depth=4, n_base_filters=32, include_label_wise_dice_coefficients=True, metrics=dice_coefficient,
                   batch_normalization=True, activation_name="sigmoid")
     logger.info('Created the model!')

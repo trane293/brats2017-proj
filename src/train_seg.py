@@ -151,7 +151,8 @@ if options.defmodelfile is None:
 modeldefmodule = importlib.import_module('defmodel.'+options.defmodelfile, package=None)
 
 # get the model
-inp_shape = tuple(config['patch_input_shape'])
+# inp_shape = tuple(config['patch_input_shape'])
+inp_shape = (4, None, None, None)
 model = modeldefmodule.get_model(inp_shape=inp_shape) # (4, x, y, z)
 
 # # compile
