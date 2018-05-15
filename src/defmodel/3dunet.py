@@ -57,7 +57,7 @@ def label_wise_dice_coefficient(y_true, y_pred, label_index):
 
 def get_label_dice_coefficient_function(label_index, label_name):
     f = partial(label_wise_dice_coefficient, label_index=label_index)
-    f.__setattr__('__name__', 'label_{0}_{}_dice_coef'.format(label_index, label_name))
+    f.__setattr__('__name__', 'label_{0}_{1}_dice_coef'.format(label_index, label_name))
     return f
 
 
@@ -258,7 +258,7 @@ def get_model(inp_shape=(4,32,32,32)):
                           deconvolution=False,
                           depth=3, n_base_filters=32, include_label_wise_dice_coefficients=True,
                           metrics=dice_coefficient,
-                          batch_normalization=True, activation_name="sigmoid", loss_fn=weighted_dice_coefficient_loss)
+                          batch_normalization=True, activation_name="sigmoid", loss_fn=dice_coefficient_loss)
     return model
 
 if __name__ == '__main__':
