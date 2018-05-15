@@ -15,3 +15,4 @@ modules/training_helpers.pyc
 curr_run.txt
 src/run_job.sh
 src/submit_job.sh
+src/slurm*
