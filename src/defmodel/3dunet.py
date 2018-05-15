@@ -55,9 +55,9 @@ def label_wise_dice_coefficient(y_true, y_pred, label_index):
     return dice_coefficient(y_true[:, label_index], y_pred[:, label_index])
 
 
-def get_label_dice_coefficient_function(label_index):
+def get_label_dice_coefficient_function(label_index, label_name):
     f = partial(label_wise_dice_coefficient, label_index=label_index)
-    f.__setattr__('__name__', 'label_{0}_dice_coef'.format(label_index))
+    f.__setattr__('__name__', 'label_{0}_{}_dice_coef'.format(label_index, label_name))
     return f
 
 
@@ -122,7 +122,13 @@ def unet_model_3d(input_shape, pool_size=(2, 2, 2), n_labels=3, initial_learning
         metrics = [metrics]
 
     if include_label_wise_dice_coefficients and n_labels > 1:
-        label_wise_dice_metrics = [get_label_dice_coefficient_function(index) for index in range(n_labels)]
+        lab_names = {
+            0: 'Necrotic',
+            1: 'Edema',
+            2: 'Enhancing'
+        }
+
+        label_wise_dice_metrics = [get_label_dice_coefficient_function(index, name) for index, name in lab_names.iteritems()]
         if metrics:
             metrics = metrics + label_wise_dice_metrics
         else:
@@ -249,8 +255,8 @@ def open_model_with_hyper_and_history(name=None, custom_obj=None, load_model_onl
 
 def get_model(inp_shape=(4,32,32,32)):
     model = unet_model_3d(input_shape=inp_shape, pool_size=(2, 2, 2), n_labels=3, initial_learning_rate=0.00001,
-                          deconvolution=True,
-                          depth=4, n_base_filters=32, include_label_wise_dice_coefficients=True,
+                          deconvolution=False,
+                          depth=3, n_base_filters=32, include_label_wise_dice_coefficients=True,
                           metrics=dice_coefficient,
                           batch_normalization=True, activation_name="sigmoid", loss_fn=weighted_dice_coefficient_loss)
     return model
