@@ -2,6 +2,7 @@ import numpy as np
 from configfile import config
 from scipy.ndimage.measurements import _stats
 import logging
+from vizhelpercode import viewInMayavi, viewArbitraryVolume
 
 logging.basicConfig(level=logging.INFO)
 try:
@@ -89,7 +90,7 @@ def calculateCOM_STD(segmask):
     return [m_x, m_y, m_z], [std_x, std_y, std_z]
 
 
-def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training'):
+def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training', applyNorm=True):
     """
     Generator for generating patches to train. Make sure you specify samples_per_epoch in the
     Keras fit_generator function to num_patient * num_patches. That will ensure that the training
@@ -115,7 +116,12 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training')
         for _enum, t_idx in enumerate(t_i):
             logger.info(prefix + ' Generating patches from Patient ID = {}, num = {}'.format(t_idx, _enum))
 
-            x = apply_mean_std(X[t_idx], mean_var)
+
+            if applyNorm == True:
+                x = apply_mean_std(X[t_idx], mean_var)
+            else:
+                x = X[t_idx]
+
             y = Y[t_idx]
 
             com, std = calculateCOM_STD(y)
@@ -143,13 +149,15 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training')
                     if t is not None:
                         k = None
                 if debug_mode == True:
-                    from vizhelpercode import viewInMayavi
                     viewInMayavi(t, y) # use this for visualizing the patches
 
                 # this condition is kind of useless here, since right now we only support the 'th' oredering fully.
                 if config['data_order'] == 'th':
                     x_patches[_t,...] = x[:, t[0]:t[1], t[2]:t[3], t[4]:t[5]]
                     y_patches[_t,...] = y[t[0]:t[1], t[2]:t[3], t[4]:t[5]]
+                    if debug_mode == True:
+                        viewArbitraryVolume(x_patches[_t], slice_idx=2, modality=1)
+                        viewArbitraryVolume(y_patches[_t], slice_idx=2, modality=1)
                 else:
                     x_patches[_t, ...] = x[t[0]:t[1], t[2]:t[3], t[4]:t[5], :]
                     y_patches[_t, ...] = y[t[0]:t[1], t[2]:t[3], t[4]:t[5]]
@@ -184,7 +192,7 @@ def printPercentages(patches):
     logger.debug('%age pixels with label 4 (Enhancing) = {}'.format((lab * 100.0) / total_pixels))
 
 
-def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False, gen_name='Training'):
+def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False, gen_name='Training', applyNorm=True):
     '''
     Generate patch batches, apply augmentation, and create multiple masks for multi-class segmentation
 
@@ -199,7 +207,8 @@ def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False,
     :return:
     '''
     while 1:
-        for x_patches, y_patches in generate_patches(X, Y, t_i, mean_var=mean_var, debug_mode=debug_mode, gen_name=gen_name):
+        for x_patches, y_patches in generate_patches(X, Y, t_i, mean_var=mean_var, debug_mode=debug_mode,
+                                                     gen_name=gen_name, applyNorm=applyNorm):
 
             for _t in range(0, x_patches.shape[0], batch_size):
                 # add augmentation code here

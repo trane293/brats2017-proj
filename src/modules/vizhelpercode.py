@@ -196,7 +196,7 @@ def viewInMayavi(patch_coords, segmask):
 
     src_bbox = mlab.pipeline.scalar_field(dense_patch)
 
-    mlab.pipeline.iso_surface(src, opacity=0.4)
+    mlab.pipeline.iso_surface(src, contours=[0,1,2,3,4,5], opacity=0.4)
     mlab.pipeline.iso_surface(src_bbox, opacity=0.2)
 
     mlab.show()

@@ -74,10 +74,12 @@ test_indices = indices[train_end:]
 # ======================================================================================
 batch_size = 10
 train_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
-                                   t_i=train_indices, mean_var=mean_var, batch_size=batch_size, debug_mode=True)
+                                   t_i=train_indices, mean_var=mean_var, batch_size=batch_size, debug_mode=True,
+                                   applyNorm=False)
 
 test_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
-                                  t_i=test_indices, mean_var=mean_var, batch_size=batch_size, debug_mode=True)
+                                  t_i=test_indices, mean_var=mean_var, batch_size=batch_size, debug_mode=True,
+                                  applyNorm=False)
 
 count = 0
 for x_patches, y_patches in test_gen:
