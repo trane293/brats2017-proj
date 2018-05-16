@@ -2,7 +2,7 @@ import numpy as np
 from configfile import config
 from scipy.ndimage.measurements import _stats
 import logging
-from vizhelpercode import viewInMayavi, viewArbitraryVolume
+#from vizhelpercode import viewInMayavi, viewArbitraryVolume
 
 logging.basicConfig(level=logging.INFO)
 try:
