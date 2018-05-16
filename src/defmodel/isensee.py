@@ -71,7 +71,8 @@ dice_coef_loss = dice_coefficient_loss
 
 def isensee2017_model(input_shape=(4, 128, 128, 128), n_base_filters=16, depth=5, dropout_rate=0.3,
                       n_segmentation_levels=3, n_labels=4, optimizer=Adam, initial_learning_rate=5e-4,
-                      loss_function=weighted_dice_coefficient_loss, activation_name="sigmoid"):
+                      loss_function=weighted_dice_coefficient_loss, activation_name="sigmoid",
+                      include_label_wise_dice_coefficients=True, metrics=dice_coefficient):
     """
     This function builds a model proposed by Isensee et al. for the BRATS 2017 competition:
     https://www.cbica.upenn.edu/sbia/Spyridon.Bakas/MICCAI_BraTS/MICCAI_BraTS_2017_proceedings_shortPapers.pdf
@@ -132,7 +133,21 @@ def isensee2017_model(input_shape=(4, 128, 128, 128), n_base_filters=16, depth=5
     activation_block = Activation(activation_name)(output_layer)
 
     model = Model(inputs=inputs, outputs=activation_block)
-    model.compile(optimizer=optimizer(lr=initial_learning_rate), loss=loss_function)
+
+    if include_label_wise_dice_coefficients:
+        lab_names = {
+            0: 'Necrotic',
+            1: 'Edema',
+            2: 'Enhancing'
+        }
+
+        label_wise_dice_metrics = [get_label_dice_coefficient_function(index, name) for index, name in
+                                   lab_names.iteritems()]
+
+        metrics = label_wise_dice_metrics
+
+
+    model.compile(optimizer=optimizer(lr=initial_learning_rate), loss=loss_function, metrics=metrics)
     return model
 
 
@@ -220,5 +235,6 @@ def get_model(inp_shape=(4,32,32,32)):
 if __name__ == '__main__':
     model = isensee2017_model(input_shape=(4, None, None, None), n_base_filters=16, depth=5, dropout_rate=0.3,
                       n_segmentation_levels=3, n_labels=3, optimizer=Adam, initial_learning_rate=5e-4,
-                      loss_function=weighted_dice_coefficient_loss, activation_name="sigmoid")
+                      loss_function=weighted_dice_coefficient_loss, activation_name="sigmoid",
+                      include_label_wise_dice_coefficients=True, metrics=dice_coefficient)
     logger.info('Created the model!')
