@@ -58,7 +58,7 @@ from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau, T
 parser = optparse.OptionParser()
 parser.add_option('--dm', '--defmodelfile',
                   dest="defmodelfile",
-                  default='3dunet',
+                  default='unet3d',
                   type='str'
                   )
 
