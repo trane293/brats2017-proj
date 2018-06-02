@@ -134,8 +134,13 @@ for i in range(0, validation_data.shape[0]):
     curr_shape.insert(0, 1) # insert 1 at index 0 to make reshaping easy
 
     pat_volume = pat_volume.reshape(curr_shape)
+
+    # SUPER HACK WAY TO CHANGE VOLUME COMPATIBILITY WITH ISENSEE MODEL. MAKE 155 = 160
+    new_pat_volume = np.zeros((1, 4, 240, 240, 160))
+    new_pat_volume[:, :, :, :, 0:155] = pat_volume
+
     # predict using the whole volume
-    pred = model.predict(pat_volume)
+    pred = model.predict(new_pat_volume)
 
     # we use the batch size = 1 for prediction.
     new_hdf5['validation_data'][i] = pred.reshape(pat_volume.shape)
