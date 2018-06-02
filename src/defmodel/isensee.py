@@ -8,8 +8,10 @@ from keras import backend as K
 import logging
 from keras.utils import multi_gpu_model
 from unet3d import create_convolution_block, concatenate
+from keras_contrib.layers.normalization import InstanceNormalization
 
 logging.basicConfig(level=logging.INFO)
+
 try:
     logger = logging.getLogger(__file__.split('/')[-1])
 except:
@@ -170,12 +172,22 @@ def create_context_module(input_layer, n_level_filters, dropout_rate=0.3, data_f
     return convolution2
 
 def custom_loss(n_labels=3):
-    name = 'weighted_dice_coefficient_loss'
-    label_wise_dice_metrics = [get_label_dice_coefficient_function(index) for index in range(n_labels)]
+
+    lab_names = {
+        0: 'Necrotic',
+        1: 'Edema',
+        2: 'Enhancing'
+    }
+
+    label_wise_dice_metrics = [get_label_dice_coefficient_function(index, name) for index, name in
+                               lab_names.iteritems()]
     metrics_dict = {func.__name__: func for func in label_wise_dice_metrics}
 
+    name = 'weighted_dice_coefficient_loss'
     metrics_dict[name] = weighted_dice_coefficient_loss
     metrics_dict['dice_coefficient'] = dice_coefficient
+
+    metrics_dict['InstanceNormalization'] = InstanceNormalization
     return metrics_dict
 
 

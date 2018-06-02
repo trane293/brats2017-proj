@@ -21,7 +21,7 @@ except:
 parser = optparse.OptionParser()
 parser.add_option('--dm', '--defmodelfile',
                   dest="defmodelfile",
-                  default='3dunet',
+                  default='isensee',
                   type='str'
                   )
 
@@ -34,7 +34,7 @@ parser.add_option('--g', '--grade',
 
 parser.add_option('--o', '--out-name',
                   dest="output_name",
-                  default='3dunet',
+                  default='isensee_main',
                   type='str'
                   )
 
@@ -54,6 +54,10 @@ parser.add_option('--mn', '--model-name',
 
 
 options, remainder = parser.parse_args()
+
+# CHANGE THE MODEL PATH HERE
+prefix = '/local-scratch/'
+options.model_name = prefix + 'cedar-rm/scratch/asa224/model-staging/isensee_main.h5'
 
 if options.output_name is None:
     logger.info('No output name defined, using default values')
@@ -98,7 +102,7 @@ validation_data = hdf5_file_g['validation_data']
 # ------------------------------------------------------------------------------------
 # create new HDF5 file to hold prediction data
 # ------------------------------------------------------------------------------------
-logger.info('Creating new HDF5 dataset to hold cropped/normalized data')
+logger.info('Creating new HDF5 dataset to hold prediction data')
 
 new_hdf5 = h5py.File(pred_filename, mode='w')
 
