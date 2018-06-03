@@ -175,6 +175,7 @@ model = modeldefmodule.open_model_with_hyper_and_history(name=options.model_name
 # -------------------------------------------------------------------------------------
 # Open the data, standardize and prepare for prediction
 # -------------------------------------------------------------------------------------
+logger.info(validation_data.shape)
 logger.info('Looping over validation data for prediction')
 for i in range(0, validation_data.shape[0]):
     logger.debug('Indexing HDF5 datastore...')
