@@ -58,38 +58,37 @@ from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau, T
 parser = optparse.OptionParser()
 parser.add_option('--dm', '--defmodelfile',
                   dest="defmodelfile",
-                  default='unet3d',
-                  type='str'
-                  )
-
-parser.add_option('--g', '--grade',
-                  dest="grade",
-                  default='HGG',
-                  type='str'
+                  default='isensee',
+                  type='str',
+                  help='Define the name of module from defmodel directory to load the model definition from'
                   )
 
 parser.add_option('--o', '--out-name',
                   dest="output_name",
-                  default='3dunet_patches.h5',
-                  type='str'
+                  default='isensee_main.h5',
+                  type='str',
+                  help='Define the name of the file that was generated after training was finished. Check model-snapshots'
                   )
 
 parser.add_option('--e', '--epochs',
                   dest="epochs",
                   default=10,
-                  type='int'
+                  type='int',
+                  help='Number of epochs to train with'
                   )
 
 parser.add_option('--b', '--batch-size',
                   dest="batch_size",
                   default=2,
-                  type='int'
+                  type='int',
+                  help='Batch size to train with'
                   )
 
 parser.add_option('--h', '--hdf5',
                   dest="hdf5_filepath",
                   default=None,
-                  type='str'
+                  type='str',
+                  help='HDF5 filepath in case loading from a non-standard location'
                   )
 
 options, remainder = parser.parse_args()
@@ -99,24 +98,16 @@ options, remainder = parser.parse_args()
 # --------------------------------------------------------------------------------------
 # open mean and variance dictionary
 
-mean_var = pickle.load(open(config['saveMeanVarFilepath'+options.grade.upper()], 'rb'))
+mean_var = pickle.load(open(config['saveMeanVarCombinedData'], 'rb'))
 
 # open new database with cropped images
 
-if config['gen_patches_from'] == 'cropped':
-    hdf5_file = h5py.File(config['hdf5_filepath_cropped'], mode='r')
-    hdf5_file_g = hdf5_file['preprocessed']
-else:
-    if options.hdf5_filepath != None:
-        logger.info('Using supplied HDF5 Filepath {}'.format(options.hdf5_filepath))
-        hdf5_file = h5py.File(options.hdf5_filepath, mode='r')
-    else:
-        hdf5_file = h5py.File(config['hdf5_filepath_prefix'], mode='r')
-    hdf5_file_g = hdf5_file['original_data']
+hdf5_file = h5py.File(config['hdf5_combined'], mode='r')
+hdf5_file_g = hdf5_file['combined']
 
 # get all the HGG/LGG data
-training_data = hdf5_file_g['training_data_'+options.grade.lower()]
-training_data_segmasks = hdf5_file_g['training_data_segmasks_'+options.grade.lower()]
+training_data = hdf5_file_g['training_data']
+training_data_segmasks = hdf5_file_g['training_data_segmasks']
 
 # ======================================================================================
 
@@ -168,7 +159,7 @@ mc = ModelCheckpoint(os.path.join(config['model_checkpoint_location'],
 
 reduceLR = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3, verbose=1, mode='auto', epsilon=0.0001, cooldown=0, min_lr=0.001)
 
-es = EarlyStopping(monitor='val_loss', min_delta=0, patience=10, verbose=1, mode='auto')
+es = EarlyStopping(monitor='val_loss', min_delta=0.01, patience=6, verbose=1, mode='auto')
 
 tb = TensorBoard(log_dir='./graph', histogram_freq=0,
           write_graph=True, write_images=True)
