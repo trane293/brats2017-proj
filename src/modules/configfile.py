@@ -76,6 +76,9 @@ config['gen_patches_from'] = 'original' # generate patches from the cropped vers
 config['validate_on'] = 'original' # Perform validation on original images or cropped images
 config['num_labels'] = 3 # number of labels in the segmentation mask, except background
 config['max_label_val'] = 4
+
+config['val_shape_after_prediction'] = []
+
 # check the order of data and chose proper data shape to save images
 if config['data_order'] == 'th':
     config['train_shape_hgg'] = (config['train_hgg_patients'], 4, config['spatial_size_for_training'][0], config['spatial_size_for_training'][1], config['num_slices'])
@@ -104,3 +107,7 @@ elif config['data_order'] == 'tf':
     config['train_segmasks_shape_lgg_crop'] = (config['train_lgg_patients'], config['size_after_cropping'][0], config['size_after_cropping'][1], config['size_after_cropping'][2])
     config['val_shape_crop'] = (config['validation_patients'], config['size_after_cropping'][0], config['size_after_cropping'][1], config['size_after_cropping'][2], 4)
     config['numpy_patch_size'] = (config['num_patches_per_patient'], config['patch_size'][0], config['patch_size'][1], config['patch_size'][2], 4)
+
+tmp = list(config['val_shape'])
+tmp[1] = config['num_labels']
+config['val_shape_after_prediction'] = tuple(tmp)

@@ -1,5 +1,5 @@
 import h5py
-from modules.configfile import config
+from modules.configfile import config, mount_path_prefix
 from modules.training_helpers import *
 import cPickle as pickle
 import numpy as np
@@ -56,8 +56,7 @@ parser.add_option('--mn', '--model-name',
 options, remainder = parser.parse_args()
 
 # CHANGE THE MODEL PATH HERE
-prefix = '/local-scratch/'
-options.model_name = prefix + 'cedar-rm/scratch/asa224/model-staging/isensee_main.h5'
+options.model_name = mount_path_prefix + 'cedar-rm/scratch/asa224/model-staging/isensee_main.h5'
 
 if options.output_name is None:
     logger.info('No output name defined, using default values')
@@ -93,7 +92,7 @@ if options.validate_on == 'cropped':
 else:
     hdf5_file = h5py.File(config['hdf5_filepath_prefix'], mode='r')
     hdf5_file_g = hdf5_file['original_data']
-    val_shape = config['val_shape']
+    val_shape = config['val_shape_after_prediction']
 
 # get the validation data
 validation_data = hdf5_file_g['validation_data']
@@ -142,8 +141,13 @@ for i in range(0, validation_data.shape[0]):
     # predict using the whole volume
     pred = model.predict(new_pat_volume)
 
-    # we use the batch size = 1 for prediction.
-    new_hdf5['validation_data'][i] = pred.reshape(pat_volume.shape)
+    # get back the main volume and strip the padding
+    pred = pred[:,:,:,:,0:155]
+
+    assert pred.shape == (1,3,240,240,155)
+
+    # we use the batch size = 1 for prediction, so the first one.
+    new_hdf5['validation_data'][i] = pred[0]
 # =====================================================================================
 
 new_hdf5.close()
