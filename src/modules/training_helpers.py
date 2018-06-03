@@ -2,6 +2,8 @@ import numpy as np
 from configfile import config
 from scipy.ndimage.measurements import _stats
 import logging
+import cPickle as pickle
+
 #from vizhelpercode import viewInMayavi, viewArbitraryVolume
 
 logging.basicConfig(level=logging.INFO)
@@ -44,6 +46,53 @@ def apply_mean_std(im, mean_var):
             im[m, ...] = (im[m, ...] - mean_var['mn'][m]) / np.sqrt(mean_var['var'][m])
 
     return im
+
+
+def standardize(images, findMeanVarOnly=True, saveDump=None, applyToTest=None):
+    """
+    This function standardizes the input data to zero mean and unit variance. It is capable of calculating the
+    mean and std values from the input data, or can also apply user specified mean/std values to the images.
+
+    :param images: numpy ndarray of shape (num_qg, channels, x, y, z) to apply mean/std normalization to
+    :param findMeanVarOnly: only find the mean and variance of the input data, do not normalize
+    :param saveDump: if True, saves the calculated mean/variance values to the disk in pickle form
+    :param applyToTest: apply user specified mean/var values to given images. checkLargestCropSize.ipynb has more info
+    :return: standardized images, and vals (if mean/val was calculated by the function
+    """
+
+    # takes a dictionary
+    if applyToTest != None:
+        logger.debug('Applying to test data using provided values')
+        images = apply_mean_std(images, applyToTest)
+        return images
+
+    logger.info('Calculating mean value..')
+    vals = {
+        'mn': [],
+        'var': []
+    }
+    for i in range(4):
+        vals['mn'].append(np.mean(images[:, i, :, :, :]))
+
+    logger.info('Calculating variance..')
+    for i in range(4):
+        vals['var'].append(np.var(images[:, i, :, :, :]))
+
+    if findMeanVarOnly == False:
+        logger.info('Starting standardization process..')
+
+        for i in range(4):
+            images[:, i, :, :, :] = ((images[:, i, :, :, :] - vals['mn'][i]) / float(vals['var'][i]))
+
+        logger.info('Data standardized!')
+
+    if saveDump != None:
+        logger.info('Dumping mean and var values to disk..')
+        pickle.dump(vals, open(saveDump, 'wb'))
+    logger.info('Done!')
+
+    return images, vals
+
 
 
 def check_valid(patch_coords):

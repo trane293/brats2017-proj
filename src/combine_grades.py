@@ -22,6 +22,7 @@ LICENCE: Proprietary for now.
 """
 
 import logging
+from modules.training_helpers import standardize
 from modules.mischelpers import *
 import os
 
@@ -90,6 +91,12 @@ g_combined['training_data'][0:config['train_hgg_patients']] = hdf5_file['trainin
 logger.info('Copying LGG patient data')
 g_combined['training_data'][config['train_hgg_patients']:] = hdf5_file['training_data_lgg'][:]
 logger.info('Data copy done!')
+
+data = g_combined['training_data']
+logger.info('Calculating mean/var values from this data')
+_tmp, vals = standardize(data, findMeanVarOnly=True, saveDump=config['saveMeanVarCombinedData'])
+logger.info('Calculating mean/var values from this data')
+
 hdf5_file_main.close()
 new_hdf5.close()
 logger.info('HDF5 Files closed!')
