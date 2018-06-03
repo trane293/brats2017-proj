@@ -26,7 +26,7 @@ def standardize(images, findMeanVarOnly=True, saveDump=None, applyToTest=None):
 
     # takes a dictionary
     if applyToTest != None:
-        logger.info('Applying to test data using provided values')
+        logger.debug('Applying to test data using provided values')
         from modules.training_helpers import apply_mean_std
         images = apply_mean_std(images, applyToTest)
         return images
