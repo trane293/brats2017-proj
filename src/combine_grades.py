@@ -88,11 +88,11 @@ logger.info('Copy patient names successful!')
 # ------------------------------------------------------------------------------------
 logger.info('Copying HGG patient data')
 g_combined['training_data'][0:config['train_hgg_patients']] = hdf5_file['training_data_hgg'][:]
-g_combined['training_data_segmasks'][0:config['train_hgg_patients']] = hdf5_file['training_data_hgg_segmasks'][:]
+g_combined['training_data_segmasks'][0:config['train_hgg_patients']] = hdf5_file['training_data_segmasks_hgg'][:]
 
 logger.info('Copying LGG patient data')
 g_combined['training_data'][config['train_hgg_patients']:] = hdf5_file['training_data_lgg'][:]
-g_combined['training_data_segmasks'][config['train_hgg_patients']:] = hdf5_file['training_data_lgg_segmasks'][:]
+g_combined['training_data_segmasks'][config['train_hgg_patients']:] = hdf5_file['training_data_segmasks_lgg'][:]
 logger.info('Data copy done!')
 
 data = g_combined['training_data']
