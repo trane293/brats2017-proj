@@ -73,19 +73,23 @@ total_shape_seg = tmp
 g_combined.create_dataset("training_data", total_shape_img, np.float32)
 g_combined.create_dataset("training_data_segmasks", total_shape_seg, np.int16)
 g_combined.create_dataset("training_data_pat_name", (total_pats,), dtype="S100")
-
+logger.info('Created datasets!')
 # ====================================================================================
 
 # just copy the patient  names directly
 # from 0 - HGG_pats we have hgg pat names and from HGG_pats:end we have LGG pat names
+logger.info('Copying patient names..')
 g_combined['training_data_pat_name'][0:config['train_hgg_patients']] = hdf5_file['training_data_hgg_pat_name'][:]
 g_combined['training_data_pat_name'][config['train_hgg_patients']:] = hdf5_file['training_data_lgg_pat_name'][:]
-
+logger.info('Copy patient names successful!')
 # ------------------------------------------------------------------------------------
 # Copy HGG and LGG data from original datastore
 # ------------------------------------------------------------------------------------
+logger.info('Copying HGG patient data')
 g_combined['training_data'][0:config['train_hgg_patients']] = hdf5_file['training_data_hgg'][:]
+logger.info('Copying LGG patient data')
 g_combined['training_data'][config['train_hgg_patients']:] = hdf5_file['training_data_lgg'][:]
-
+logger.info('Data copy done!')
 hdf5_file_main.close()
 new_hdf5.close()
+logger.info('HDF5 Files closed!')
