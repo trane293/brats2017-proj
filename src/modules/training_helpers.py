@@ -123,10 +123,10 @@ def calculateCOM_STD(segmask):
 
     # brute force way to make sure the COM calculation is weighted correctly. We need more
     # weight on necrotic region, than edema.
-    seg_reweighted[np.where(segmask == 1)] = 10  # necrotic, the most inner region, has highest weight
-    seg_reweighted[np.where(segmask == 4)] = 9  # enhancing
-    seg_reweighted[np.where(segmask == 3)] = 8  # non-enhancing
-    seg_reweighted[np.where(segmask == 2)] = 7  # edema
+    seg_reweighted[np.where(segmask == 1)] = 10.0  # necrotic, the most inner region, has highest weight
+    seg_reweighted[np.where(segmask == 4)] = 9.0  # enhancing
+    seg_reweighted[np.where(segmask == 3)] = 8.0  # non-enhancing
+    seg_reweighted[np.where(segmask == 2)] = 7.0  # edema
 
     # calculate COM
     m_x, m_y, m_z = center_of_mass(seg_reweighted)

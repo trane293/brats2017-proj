@@ -173,11 +173,11 @@ total_per_epoch_testing = (len(test_indices) * config['num_patches_per_patient']
 
 train_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
                                    t_i=train_indices, mean_var=mean_var, batch_size=batch_size, gen_name='Training',
-                                   applyNorm=True)
+                                   applyNorm=True, debug_mode=True)
 
 test_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
                                   t_i=test_indices, mean_var=mean_var, batch_size=batch_size, gen_name='Testing',
-                                  applyNorm=True)
+                                  applyNorm=True, debug_mode=True)
 
 history = model.fit_generator(train_gen, steps_per_epoch=total_per_epoch_training,
                     epochs=epochs, verbose=1, callbacks=[mc, reduceLR, tb],
