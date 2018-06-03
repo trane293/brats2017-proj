@@ -177,6 +177,7 @@ model = modeldefmodule.open_model_with_hyper_and_history(name=options.model_name
 # -------------------------------------------------------------------------------------
 logger.info('Looping over validation data for prediction')
 for i in range(0, validation_data.shape[0]):
+    logger.debug('Indexing HDF5 datastore...')
     pat_volume = validation_data[i]
     logger.debug('Standardizing..')
     pat_volume = standardize(pat_volume, applyToTest=mean_var)
