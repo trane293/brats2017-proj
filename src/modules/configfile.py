@@ -40,6 +40,7 @@ config = {}
 # data_dir is the top level path containing both training and validation sets of the brats dataset.
 config['data_dir_prefix'] = os.path.join(mount_path_prefix, 'scratch/asa224/Datasets/BRATS2018/') # this should be top level path
 config['hdf5_filepath_prefix'] = os.path.join(mount_path_prefix, 'scratch/asa224/Datasets/BRATS2018/HDF5_Datasets/BRATS2018.h5') # top level path
+config['hdf5_filepath_prefix_2017'] = os.path.join(mount_path_prefix, 'scratch/asa224/Datasets/BRATS2017/HDF5_Datasets/BRATS.h5') # top level path
 config['hdf5_filepath_cropped'] = os.path.join(mount_path_prefix, 'scratch/asa224/Datasets/BRATS2018/HDF5_Datasets/BRATS2018_Cropped_Normalized.h5') # top level path
 config['saveMeanVarFilepathHGG'] = os.path.join(os.sep.join(config['hdf5_filepath_prefix'].split(os.sep)[0:-1]), 'BRATS2018_HDF5_Datasetstraining_data_hgg_mean_var.p')
 config['saveMeanVarFilepathLGG'] = os.path.join(os.sep.join(config['hdf5_filepath_prefix'].split(os.sep)[0:-1]), 'BRATS2018_HDF5_Datasetstraining_data_lgg_mean_var.p')

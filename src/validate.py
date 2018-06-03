@@ -88,7 +88,7 @@ parser.add_option('--o', '--out-name',
 # decouple this from global variable.
 parser.add_option('--vo', '--validate-on',
                   dest="validate_on",
-                  default='original',
+                  default='2017',
                   type='str'
                   )
 
@@ -132,14 +132,17 @@ mean_var = pickle.load(open(config['saveMeanVarFilepath' + options.grade.upper()
 # if you want to run on cropped images, then load the cropping coordinates as well
 # then create a new empty array, set the voxels of that array according to the cropping coordinates
 # to recreate the original image that the system accpts.
-if options.validate_on == 'cropped':
-    hdf5_file = h5py.File(config['hdf5_filepath_cropped'], mode='r')
-    hdf5_file_g = hdf5_file['preprocessed']
-    val_shape = config['val_shape_crop']
-else:
+if options.validate_on == '2018':
+    logger.info('Validating on 2018 Validation Set!')
     hdf5_file = h5py.File(config['hdf5_filepath_prefix'], mode='r')
     hdf5_file_g = hdf5_file['original_data']
     val_shape = config['val_shape_after_prediction']
+else:
+    logger.info('Validating on 2017 Validation Set!')
+    hdf5_file = h5py.File(config['hdf5_filepath_prefix_2017'], mode='r')
+    hdf5_file_g = hdf5_file['original_data']
+    val_shape = config['val_shape_after_prediction']
+
 
 # get the validation data
 validation_data = hdf5_file_g['validation_data']
