@@ -175,8 +175,10 @@ model = modeldefmodule.open_model_with_hyper_and_history(name=options.model_name
 # -------------------------------------------------------------------------------------
 # Open the data, standardize and prepare for prediction
 # -------------------------------------------------------------------------------------
+logger.info('Looping over validation data for prediction')
 for i in range(0, validation_data.shape[0]):
     pat_volume = validation_data[i]
+    logger.debug('Standardizing..')
     pat_volume = standardize(pat_volume, applyToTest=mean_var)
 
     curr_shape = list(pat_volume.shape)
@@ -188,6 +190,7 @@ for i in range(0, validation_data.shape[0]):
     new_pat_volume = np.zeros((1, 4, 240, 240, 160))
     new_pat_volume[:, :, :, :, 0:155] = pat_volume
 
+    logger.debug('Starting prediction..')
     # predict using the whole volume
     pred = model.predict(new_pat_volume)
 
@@ -196,6 +199,7 @@ for i in range(0, validation_data.shape[0]):
 
     assert pred.shape == (1,3,240,240,155)
 
+    logger.debug('Adding predicted volume to HDF5 store..')
     # we use the batch size = 1 for prediction, so the first one.
     new_hdf5['validation_data'][i] = pred[0]
 # =====================================================================================
