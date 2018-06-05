@@ -18,3 +18,4 @@ src/submit_job.sh
 src/slurm*
 src/.ipynb_checkpoints/
 src/graph/
+src/test_cases/.ipynb_checkpoints/

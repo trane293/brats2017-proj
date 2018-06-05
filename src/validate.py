@@ -32,12 +32,6 @@ parser.add_option('--g', '--grade',
                   type='str'
                   )
 
-parser.add_option('--o', '--out-name',
-                  dest="output_name",
-                  default='isensee_main',
-                  type='str'
-                  )
-
 # decouple this from global variable.
 parser.add_option('--vo', '--validate-on',
                   dest="validate_on",
@@ -56,19 +50,8 @@ parser.add_option('--mn', '--model-name',
 options, remainder = parser.parse_args()
 
 # CHANGE THE MODEL PATH HERE
-options.model_name = mount_path_prefix + 'scratch/asa224/model-staging/isensee_main.h5'
-
-if options.output_name is None:
-    logger.info('No output name defined, using default values')
-    pred_filename = os.path.join(config['model_prediction_location'],
-                                 'BRATS_Validation_Prediction_' + 'model_default.h5')
-    options.output_name = os.path.join(config['model_snapshot_location'], 'model_default.h5')
-    logger.info('Name of output file: {}'.format(options.output_name))
-else:
-    pred_filename = os.path.join(config['model_prediction_location'],
-                                 'BRATS_Validation_Prediction_' + options.output_name)
-    options.output_name = os.path.join(config['model_snapshot_location'], options.output_name)
-    logger.info('Name of input model file: {}'.format(options.output_name))
+options.model_name = mount_path_prefix + 'scratch/asa224/model-staging/isensee_combined.h5'
+options.grade = 'combined'
 
 if options.defmodelfile is None:
     logger.info('No defmodel file name defined, using default model (cnn)')
@@ -79,7 +62,10 @@ if options.defmodelfile is None:
 # --------------------------------------------------------------------------------------
 # open mean and variance dictionary
 
-mean_var = pickle.load(open(config['saveMeanVarFilepath' + options.grade.upper()], 'rb'))
+if options.grade == 'HGG' or options.grade == 'LGG':
+    mean_var = pickle.load(open(config['saveMeanVarFilepath' + options.grade.upper()], 'rb'))
+else:
+    mean_var = pickle.load(open(config['saveMeanVarCombinedData'], 'rb'))
 
 # open new database with cropped images
 # if you want to run on cropped images, then load the cropping coordinates as well
@@ -105,7 +91,7 @@ validation_data = hdf5_file_g['validation_data']
 # create new HDF5 file to hold prediction data
 # ------------------------------------------------------------------------------------
 logger.info('Creating new HDF5 dataset to hold prediction data')
-
+pred_filename = os.path.join(config['model_prediction_location'], 'model_predictions_' + options.model_name.split('/')[-1])
 new_hdf5 = h5py.File(pred_filename, mode='w')
 
 new_hdf5.create_dataset("validation_data", val_shape, np.float32)
