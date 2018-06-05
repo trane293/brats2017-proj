@@ -49,10 +49,6 @@ parser.add_option('--mn', '--model-name',
 
 options, remainder = parser.parse_args()
 
-# CHANGE THE MODEL PATH HERE
-options.model_name = mount_path_prefix + 'scratch/asa224/model-staging/isensee_combined.h5'
-options.grade = 'combined'
-
 if options.defmodelfile is None:
     logger.info('No defmodel file name defined, using default model (cnn)')
     options.defmodelfile = 'cnn'
