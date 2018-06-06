@@ -164,10 +164,10 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
 
     while 1:
         if run_num != 0 and run_num % 3 == 0:
-            logger.debug('Increasing std_scale to {}'.format(config['std_scale']))
+            logger.info('Increasing std_scale to {}'.format(config['std_scale']))
             std_scale = config['std_scale']
         else:
-            logger.debug('Lowering std_scale to 1.0')
+            logger.info('Lowering std_scale to 1.0')
             std_scale = 1.0
 
         logger.warn(prefix + ' Iteration over all patient data starts')
