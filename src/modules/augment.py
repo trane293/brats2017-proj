@@ -77,8 +77,8 @@ def remove_sequence(x_data):
     sequences = [0,1,2,3]
 
     for curr_eg in range(x_data.shape[0]):
-        r = random.randint(0, 10)
-        if r > 8:
+        r = random.choice([0, 1])
+        if r == 1:
             # how many sequences to remove
             hm = random.randint(0, 3)
             rm_seq = random.sample(sequences, hm)
