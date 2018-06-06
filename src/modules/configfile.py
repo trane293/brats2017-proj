@@ -57,7 +57,7 @@ config['model_prediction_location'] = os.path.join(mount_path_prefix, 'scratch/a
 # IF YOU PERFORM PREPROCESSING, THESE VARIABLES ARE TO BE CHANGED.
 config['spatial_size_for_training'] = (240, 240) # If any preprocessing is done, then this needs to change. This is the shape of data that you want to train with. If you are changing this that means you did some preprocessing.
 config['num_slices'] = 155 # number of slices in input data. THIS SHOULD CHANGE AS WELL WHEN PERFORMING PREPROCESSING
-config['volume_size'] = list(config['spatial_size_for_training']).append(config['num_slices'])
+config['volume_size'] = list(config['spatial_size_for_training']) + [config['num_slices']]
 
 config['data_order'] = 'th' # what order should the indices be to store in hdf5 file
 config['train_hgg_patients'] = 210 # number of HGG patients in training
@@ -72,7 +72,7 @@ config['size_after_cropping'] = [194, 155, 148] # set this if you set the above 
 config['data_split'] = {'train': 95,
                         'test': 5}
 
-config['std_scale'] = 6 # scale the standard deviation for path generation process to allow patches from far off regions
+config['std_scale'] = 200 # scale the standard deviation for path generation process to allow patches from far off regions
 config['num_patches_per_patient'] = 50 # number of patches to generate for a single patient
 config['patch_size'] = [64, 64, 64] # size of patch to extract
 config['patch_input_shape'] = [4] + config['patch_size']

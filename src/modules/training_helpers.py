@@ -1,11 +1,16 @@
+
 import numpy as np
 from configfile import config
 from scipy.ndimage.measurements import _stats
 import logging
 import cPickle as pickle
 from augment import augment_data
+import platform
 
-#from vizhelpercode import viewInMayavi, viewArbitraryVolume
+# to make the code portable even on cedar,you need to add conditions here
+node_name = platform.node()
+if node_name == 'XPS15' or 'cs-mial-31' in node_name:
+    from vizhelpercode import viewInMayavi, viewArbitraryVolume
 
 logging.basicConfig(level=logging.INFO)
 try:
@@ -105,9 +110,9 @@ def check_valid(patch_coords):
 
     xmin, xmax, ymin, ymax, zmin, zmax = patch_coords
 
-    if xmin >= 0 and xmax < config['size_after_cropping'][0] and \
-            ymin >= 0 and ymax < config['size_after_cropping'][1] and \
-            zmin >= 0 and zmax < config['size_after_cropping'][2]:
+    if xmin >= 0 and xmax < config['volume_size'][0] and \
+            ymin >= 0 and ymax < config['volume_size'][1] and \
+            zmin >= 0 and zmax < config['volume_size'][2]:
         return patch_coords
     else:
         return None
@@ -160,8 +165,17 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
     y_patches = np.empty((config['num_patches_per_patient'], config['patch_size'][0], config['patch_size'][1],
                          config['patch_size'][2]))
     prefix = '[' + gen_name + ']'
+    epoch_count = 0
+    std_scale = config['std_scale']
+    logger.info('Current std_scale = {}'.format(std_scale))
 
     while 1:
+        # every 10 epochs, std_scale is reduced by a factor of 2
+        if epoch_count % 10 == 0:
+            logger.info('Reducing std_scale factor')
+            std_scale = std_scale / 2.0
+            logger.info('New std_scale = {}'.format(std_scale))
+
         logger.warn(prefix + ' Iteration over all patient data starts')
         for _enum, t_idx in enumerate(t_i):
             logger.info(prefix + ' Generating patches from Patient ID = {}, num = {}'.format(t_idx, _enum))
@@ -184,7 +198,7 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
 
                     # randomly sample cube center coordinates from multivariate gaussian
                     xc, yc, zc = np.random.multivariate_normal(mean=com,
-                                                               cov=np.diag(np.array(std) * config['std_scale']))
+                                                               cov=np.diag(np.array(std) * std_scale))
                     xmin = int(xc) - (patch_size_x / 2)
                     xmax = int(xc) + (patch_size_x / 2)
 
