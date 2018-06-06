@@ -181,6 +181,7 @@ total_per_epoch_testing = (len(test_indices) * config['num_patches_per_patient']
 
 augment = ['permute']
 if options.remove_seq == True:
+    logger.info('Running training with remove_sequence=True')
     augment.append('remove_seq')
 
 train_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
