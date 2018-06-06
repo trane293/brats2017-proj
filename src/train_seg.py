@@ -91,6 +91,14 @@ parser.add_option('--h', '--hdf5',
                   help='HDF5 filepath in case loading from a non-standard location'
                   )
 
+parser.add_option('--rs', '--remove-seq',
+                  dest="remove_seq",
+                  action="store_true",
+                  default=False,
+                  help='Enable mean imputation based data augmentation'
+                  )
+
+
 options, remainder = parser.parse_args()
 
 # --------------------------------------------------------------------------------------
@@ -171,13 +179,17 @@ batch_size = options.batch_size
 total_per_epoch_training = (len(train_indices) * config['num_patches_per_patient'] / batch_size)
 total_per_epoch_testing = (len(test_indices) * config['num_patches_per_patient'] / batch_size)
 
+augment = ['permute']
+if options.remove_seq == True:
+    augment.append('remove_seq')
+
 train_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
                                    t_i=train_indices, mean_var=mean_var, batch_size=batch_size, gen_name='Training',
-                                   applyNorm=True, augment=True)
+                                   applyNorm=True, augment=augment)
 
 test_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
                                   t_i=test_indices, mean_var=mean_var, batch_size=batch_size, gen_name='Testing',
-                                  applyNorm=True, augment=True)
+                                  applyNorm=True, augment=augment)
 
 history = model.fit_generator(train_gen, steps_per_epoch=total_per_epoch_training,
                     epochs=epochs, verbose=1, callbacks=[mc, reduceLR, tb],

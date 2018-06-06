@@ -243,7 +243,7 @@ def printPercentages(patches):
 
 
 def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False, gen_name='Training',
-                           applyNorm=True, augment=True):
+                           applyNorm=True, augment=None):
     '''
     Generate patch batches, apply augmentation, and create multiple masks for multi-class segmentation
 
@@ -282,8 +282,8 @@ def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False,
                     y_batch_channel_wise[:, idx, ...][np.where(y_batch == i)] = 1
 
                 # add augmentation code here
-                if augment == True:
-                    x_batch, y_batch_channel_wise = augment_data(x_batch, y_batch_channel_wise, permute=True)
+                if augment != None:
+                    x_batch, y_batch_channel_wise = augment_data(x_batch, y_batch_channel_wise, augment=augment)
 
 
                 yield x_batch, y_batch_channel_wise

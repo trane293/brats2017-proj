@@ -65,11 +65,34 @@ def random_permutation_x_y(x_data, y_data):
     return permute_data(x_data, key), permute_data(y_data, key)
 
 
-def augment_data(x_data, y_data, permute=True):
+def remove_sequence(x_data):
+    # randomly remove a sequence from the x_data
+    # remember nothing needs to be for the y_data, since that is the ground truth and we want network to learn it.
+    # for normalized data with zero mean and unit variance, this is equivalent to imputing the
+    # sequence with all zeros.
+    # Set all values of a random sequence = 0
+
+    # assuming a batch will be coming with first dimension = batch size. So we permute for all examples in this batch
+    assert (len(x_data.shape) > 4), 'Batch size incorrect'
+    sequences = [0,1,2,3]
+
+    for curr_eg in range(x_data.shape[0]):
+        r = random.randint(0, 10)
+        if r > 8:
+            # how many sequences to remove
+            hm = random.randint(0, 3)
+            rm_seq = random.sample(sequences, hm)
+            for curr_seq in rm_seq:
+                x_data[curr_eg,curr_seq,] = 0.0
+
+
+def augment_data(x_data, y_data, augment=None):
     # assuming a batch will be coming with first dimension = batch size. So we permute for all examples in this batch
     assert (len(x_data.shape) > 4) and (len(y_data.shape) > 4), 'Batch size incorrect'
-    for curr_eg in range(x_data.shape[0]):
-        if permute == True:
+    if 'permute' in augment:
+        for curr_eg in range(x_data.shape[0]):
             x_data[curr_eg,], y_data[curr_eg,] = random_permutation_x_y(x_data[curr_eg,], y_data[curr_eg,])
+    if 'remove_seq' in augment == True:
+        x_data = remove_sequence(x_data)
 
     return x_data, y_data
