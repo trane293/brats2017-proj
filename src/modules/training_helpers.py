@@ -171,7 +171,7 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
 
     while 1:
         # every 10 epochs, std_scale is reduced by a factor of 2
-        if epoch_count % 10 == 0:
+        if epoch_count != 0 and epoch_count % 10 == 0:
             logger.info('Reducing std_scale factor')
             std_scale = std_scale / 2.0
             logger.info('New std_scale = {}'.format(std_scale))
@@ -227,7 +227,9 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
                     y_patches[_t, ...] = y[t[0]:t[1], t[2]:t[3], t[4]:t[5]]
 
             printPercentages(y_patches)
+
             yield x_patches, y_patches
+        epoch_count += 1
 
 
 def printPercentages(patches):
