@@ -3,6 +3,7 @@ from configfile import config
 from scipy.ndimage.measurements import _stats
 import logging
 import cPickle as pickle
+from augment import augment_data
 
 #from vizhelpercode import viewInMayavi, viewArbitraryVolume
 
@@ -241,7 +242,8 @@ def printPercentages(patches):
     logger.debug('%age pixels with label 4 (Enhancing) = {}'.format((lab * 100.0) / total_pixels))
 
 
-def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False, gen_name='Training', applyNorm=True):
+def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False, gen_name='Training',
+                           applyNorm=True, augment=True):
     '''
     Generate patch batches, apply augmentation, and create multiple masks for multi-class segmentation
 
@@ -260,7 +262,6 @@ def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False,
                                                      gen_name=gen_name, applyNorm=applyNorm):
 
             for _t in range(0, x_patches.shape[0], batch_size):
-                # add augmentation code here
 
                 # yield batches
                 x_batch = x_patches[_t:_t + batch_size, ...]
@@ -279,6 +280,10 @@ def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False,
                     # in the zeroth channel, find the voxels which are 1, and set all those corresponding voxels as 1
                     # there's no seperate  channel  for background class.
                     y_batch_channel_wise[:, idx, ...][np.where(y_batch == i)] = 1
+
+                # add augmentation code here
+                if augment == True:
+                    x_batch, y_batch_channel_wise = augment_data(x_batch, y_batch_channel_wise, permute=True)
 
 
                 yield x_batch, y_batch_channel_wise
