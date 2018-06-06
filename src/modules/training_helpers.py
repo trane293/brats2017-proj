@@ -153,7 +153,6 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
     """
 
     # get the required patch size
-    run_num = 0
     patch_size_x, patch_size_y, patch_size_z = config['patch_size']
 
     # initialize the patches array to be used for training
@@ -163,13 +162,6 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
     prefix = '[' + gen_name + ']'
 
     while 1:
-        if run_num != 0 and run_num % 3 == 0:
-            logger.info('Increasing std_scale to {}'.format(config['std_scale']))
-            std_scale = config['std_scale']
-        else:
-            logger.info('Lowering std_scale to 1.0')
-            std_scale = 1.0
-
         logger.warn(prefix + ' Iteration over all patient data starts')
         for _enum, t_idx in enumerate(t_i):
             logger.info(prefix + ' Generating patches from Patient ID = {}, num = {}'.format(t_idx, _enum))
@@ -192,7 +184,7 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
 
                     # randomly sample cube center coordinates from multivariate gaussian
                     xc, yc, zc = np.random.multivariate_normal(mean=com,
-                                                               cov=np.diag(np.array(std) * std_scale))
+                                                               cov=np.diag(np.array(std) * config['std_scale']))
                     xmin = int(xc) - (patch_size_x / 2)
                     xmax = int(xc) + (patch_size_x / 2)
 
@@ -221,7 +213,6 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
                     y_patches[_t, ...] = y[t[0]:t[1], t[2]:t[3], t[4]:t[5]]
 
             printPercentages(y_patches)
-            run_num += 1
             yield x_patches, y_patches
 
 
