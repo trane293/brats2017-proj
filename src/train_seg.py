@@ -168,8 +168,9 @@ mc = ModelCheckpoint(os.path.join(config['model_checkpoint_location'],
 reduceLR = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3, verbose=1, mode='auto', epsilon=0.0001, cooldown=0, min_lr=0.001)
 
 es = EarlyStopping(monitor='val_loss', min_delta=0.01, patience=6, verbose=1, mode='auto')
-os.system('mkdir ./graph/{}'.format(options.output_name))
-tb = TensorBoard(log_dir='./graph/{}'.format(options.output_name), histogram_freq=0,
+exp_name = options.output_name.split('/')[-1]
+os.system('mkdir ./graph/{}'.format(exp_name))
+tb = TensorBoard(log_dir='./graph/{}'.format(exp_name), histogram_freq=0,
           write_graph=True, write_images=True)
 # ======================================================================================
 
