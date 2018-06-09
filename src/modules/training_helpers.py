@@ -170,11 +170,11 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
     logger.info('Current std_scale = {}'.format(std_scale))
 
     while 1:
-        # every 10 epochs, std_scale is reduced by a factor of 2
-        if epoch_count != 0 and epoch_count % 10 == 0:
-            logger.info('Reducing std_scale factor')
-            std_scale = std_scale / 2.0
-            logger.info('New std_scale = {}'.format(std_scale))
+        # # every 10 epochs, std_scale is reduced by a factor of 2
+        # if epoch_count != 0 and epoch_count % 10 == 0:
+        #     logger.info('Reducing std_scale factor')
+        #     std_scale = std_scale / 2.0
+        #     logger.info('New std_scale = {}'.format(std_scale))
 
         logger.warn(prefix + ' Iteration over all patient data starts')
         for _enum, t_idx in enumerate(t_i):
