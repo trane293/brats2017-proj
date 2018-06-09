@@ -80,7 +80,7 @@ def remove_sequence(x_data):
         r = random.choice([0, 1])
         if r == 1:
             # how many sequences to remove
-            hm = random.randint(0, 3)
+            hm = random.randint(1, 3)
             rm_seq = random.sample(sequences, hm)
             for curr_seq in rm_seq:
                 x_data[curr_eg,curr_seq,] = 0.0
