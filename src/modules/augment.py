@@ -92,7 +92,7 @@ def augment_data(x_data, y_data, augment=None):
     if 'permute' in augment:
         for curr_eg in range(x_data.shape[0]):
             x_data[curr_eg,], y_data[curr_eg,] = random_permutation_x_y(x_data[curr_eg,], y_data[curr_eg,])
-    if 'remove_seq' in augment == True:
+    if 'remove_seq' in augment:
         x_data = remove_sequence(x_data)
 
     return x_data, y_data
