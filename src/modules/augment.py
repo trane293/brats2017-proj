@@ -85,6 +85,8 @@ def remove_sequence(x_data):
             for curr_seq in rm_seq:
                 x_data[curr_eg,curr_seq,] = 0.0
 
+    return x_data
+
 
 def augment_data(x_data, y_data, augment=None):
     # assuming a batch will be coming with first dimension = batch size. So we permute for all examples in this batch
