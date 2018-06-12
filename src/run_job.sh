@@ -1,0 +1,21 @@
+#!/bin/bash
+#SBATCH --nodes=1               # number of nodes
+#SBATCH --ntasks=1              # number of MPI processes
+#SBATCH --cpus-per-task=24      # 24 cores on cedar nodes
+#SBATCH --gres=gpu:4            # special request for GPUs
+#SBATCH --account=rrg-hamarneh
+#SBATCH --mem=0                 # give all memory you have in the node
+#SBATCH --time=50:00:00         # time (DD-HH:MM)
+#SBATCH -output=slurm.%N.%j.out      # STDOUT
+#SBATCH --name=train_seg.py
+
+# load the modules
+echo "Loading Python module.."
+module load python/2.7.14
+
+# change to appropriate environment
+echo "Changing to brats environment.."
+workon brats
+
+# run the command
+python train_seg.py --e 30 --b 2 --dm isensee --o isensee_128

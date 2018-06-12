@@ -13,7 +13,6 @@ modules/configfile.pyc
 modules/training_helpers.pyc
 ../environment_cedar.yml
 curr_run.txt
-src/run_job.sh
 src/submit_job.sh
 src/slurm*
 src/.ipynb_checkpoints/
