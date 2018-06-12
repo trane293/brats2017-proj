@@ -7,7 +7,9 @@
 #SBATCH --mem=0                 # give all memory you have in the node
 #SBATCH --time=50:00:00         # time (DD-HH:MM)
 #SBATCH -output=slurm.%N.%j.out      # STDOUT
-#SBATCH --name=train_seg.py
+#SBATCH --job-name=train_seg.py
+#SBATCH --mail-user=asa224@sfu.ca
+#SBATCH --mail-type=ALL
 
 # load the modules
 echo "Loading Python module.."
