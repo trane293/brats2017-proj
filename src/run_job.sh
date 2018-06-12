@@ -18,4 +18,4 @@ echo "Changing to brats environment.."
 workon brats
 
 # run the command
-python train_seg.py --e 30 --b 2 --dm isensee --o isensee_128
+python train_seg.py --e 50 --b 10 --dm isensee --o isensee_main
