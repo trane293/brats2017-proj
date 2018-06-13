@@ -5,7 +5,7 @@ from scipy.ndimage.measurements import _stats
 import logging
 import cPickle as pickle
 from augment import augment_data
-import platform
+import platform, random
 
 # to make the code portable even on cedar,you need to add conditions here
 node_name = platform.node()
@@ -166,8 +166,7 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
                          config['patch_size'][2]))
     prefix = '[' + gen_name + ']'
     epoch_count = 0
-    std_scale = config['std_scale']
-    logger.info('Current std_scale = {}'.format(std_scale))
+    std_scale = random.choice(config['std_scale_range'])
 
     while 1:
         # # every 10 epochs, std_scale is reduced by a factor of 2
@@ -177,9 +176,13 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
         #     logger.info('New std_scale = {}'.format(std_scale))
 
         logger.warn(prefix + ' Iteration over all patient data starts')
+        if gen_name == 'Training':
+            std_scale = random.choice(config['std_scale_range'])
+
+        logger.info('Current std_scale = {}'.format(std_scale))
+
         for _enum, t_idx in enumerate(t_i):
             logger.info(prefix + ' Generating patches from Patient ID = {}, num = {}'.format(t_idx, _enum))
-
 
             if applyNorm == True:
                 x = apply_mean_std(X[t_idx], mean_var)
