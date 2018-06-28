@@ -34,6 +34,8 @@ def get_model(inp_shape=(1, None, None, None)):
                          spatial_transformer, common_merge, ind_outs, fuse_outs)
     mm.build()
 
+    return mm
+
 
 class Multimodel(object):
     '''
