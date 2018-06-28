@@ -346,7 +346,7 @@ def get_decoder_outputs(output_modalities, decoders, embeddings):
             out_em = decode(em)
             name = 'em_' + str(emi) + '_dec_' + output_modalities[di]
             l = Lambda(lambda x: x + 0, name=name)(out_em)
-            l.name = name
+            # l.name = name
             outputs.append(l)
             print 'making output:', em.type, out_em.type, name
 
