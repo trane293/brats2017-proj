@@ -107,9 +107,8 @@ else:
 # get model file
 # -------------------------------------------------------------------------------------
 # open the model file module
-import defmodel.multimodal as multimodal
 
-# modeldefmodule = importlib.import_module('defmodel.'+options.defmodelfile, package=None)
+modeldefmodule = importlib.import_module('defmodel.'+options.defmodelfile, package=None)
 
 # get the model
 # inp_shape = tuple(config['patch_input_shape'])
@@ -117,7 +116,7 @@ inp_shape = (1, None, None, None)
 
 
 # TODO: Implement get_model in multimodal.py
-model = multimodal.get_model(inp_shape=inp_shape) # (4, x, y, z)
+model = modeldefmodule.get_model(inp_shape=inp_shape) # (4, x, y, z)
 
 
 

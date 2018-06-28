@@ -65,12 +65,12 @@ class Multimodel(object):
         self.num_emb = len(input_modalities) + 1
 
         if spatial_transformer:
-            self.H, self.W = 240, 240  # Width/Height for ISLES2015 dataset
+            self.H, self.W, self.Z = None, None, None  # Width/Height for ISLES2015 dataset
         else:
-            self.H, self.W = 240, 240
+            self.H, self.W, self.Z = None, None, None
 
     def encoder_maker(self, modality):
-        inp = Input(shape=(self.channels, self.H, self.W), name='enc_' + modality + '_input')
+        inp = Input(shape=(self.channels, self.H, self.W, self.Z), name='enc_' + modality + '_input')
         conv = Conv3D(32, 3, padding='same', name='enc_' + modality + '_conv1')(inp)
         act = LeakyReLU()(conv)
         conv = Conv3D(32, 3, padding='same', name='enc_' + modality + '_conv2')(act)
