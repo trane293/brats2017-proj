@@ -107,7 +107,7 @@ else:
 # get model file
 # -------------------------------------------------------------------------------------
 # open the model file module
-modeldefmodule = importlib.import_module('defmodel.multimodal.'+options.defmodelfile, package=None)
+modeldefmodule = importlib.import_module('defmodel.'+options.defmodelfile, package=None)
 
 # get the model
 # inp_shape = tuple(config['patch_input_shape'])

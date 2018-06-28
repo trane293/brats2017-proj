@@ -14,7 +14,7 @@ from keras.layers.convolutional import Conv2D, UpSampling2D
 from keras import backend as K
 from keras.layers.core import Dense, Activation, Flatten
 
-from SpatialTransformerLayer import SpatialTransformer
+from src.defmodel.SpatialTransformerLayer import SpatialTransformer
 import keras
 keras.backend.common._IMAGE_DATA_FORMAT='channels_first'
 
