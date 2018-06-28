@@ -16,7 +16,7 @@ from keras.layers.core import Dense, Activation, Flatten
 
 from src.defmodel.SpatialTransformerLayer import SpatialTransformer
 import keras
-keras.backend.common._IMAGE_DATA_FORMAT='channels_first'
+# keras.backend.common._IMAGE_DATA_FORMAT='channels_first'
 
 def get_model(inp_shape=(1, None, None, None)):
     print('Creating model...')

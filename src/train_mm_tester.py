@@ -117,6 +117,6 @@ inp_shape = (1, None, None, None)
 
 # TODO: Implement get_model in multimodal.py
 model_obj = modeldefmodule.get_model(inp_shape=inp_shape) # (4, x, y, z)
-
+print('Hello')
 
 
