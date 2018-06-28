@@ -24,6 +24,9 @@ LICENCE: Proprietary for now.
 import os
 import platform
 
+# WE CAN USE THIS TO CHANGE IMAGE_DATA_FORMAT on the fly
+# keras.backend.common._IMAGE_DATA_FORMAT='channels_first'
+
 # to make the code portable even on cedar,you need to add conditions here
 node_name = platform.node()
 if node_name == 'XPS15':

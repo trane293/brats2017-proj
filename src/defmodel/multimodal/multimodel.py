@@ -18,6 +18,23 @@ from SpatialTransformerLayer import SpatialTransformer
 import keras
 keras.backend.common._IMAGE_DATA_FORMAT='channels_first'
 
+def get_model(inp_shape=(4, None, None, None)):
+    print('Creating model...')
+    chn = inp_shape[0]
+    print 'Channels: %d' % chn
+    input_modalities = ['T1', 'T2', 'T1CE', 'T2FLAIR']
+    output_weights = {'MASK_edema': 1.0, 'MASK_enhancing': 1.0, 'MASK_nec_ne': 1.0, 'concat': 1.0}
+    output_modalities = sorted([o for o in output_weights if o != 'concat'])
+    latent_dim = 16
+    spatial_transformer = True
+    common_merge='max'
+    ind_outs = True
+    fuse_outs = True
+    mm = Multimodel(input_modalities, output_modalities, output_weights, latent_dim, chn,
+                         spatial_transformer, common_merge, ind_outs, fuse_outs)
+    mm.build()
+
+
 class Multimodel(object):
     '''
     Class for constructing a neural network model as described in
