@@ -137,10 +137,11 @@ class Multimodel(object):
         weighted_rep = embeddings[-1]
 
         all_emb_flattened = [new_flatten(emb) for emb in ind_emb]
-        concat_emb = merge(all_emb_flattened, mode='concat', concat_axis=1, name='em_concat')
+        name = 'em_concat'
+        concat_emb = merge(all_emb_flattened, mode='concat', concat_axis=1, name=name)
 
         outputs.append(concat_emb)
-        print 'making output: em_concat', concat_emb.type, concat_emb.name
+        print 'making output: em_concat', name
 
         fused_emb = new_flatten(weighted_rep, name='em_fused')
         outputs.append(fused_emb)
