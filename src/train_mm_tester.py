@@ -113,7 +113,7 @@ import defmodel.multimodal as multimodal
 
 # get the model
 # inp_shape = tuple(config['patch_input_shape'])
-inp_shape = (4, None, None, None)
+inp_shape = (1, None, None, None)
 
 
 # TODO: Implement get_model in multimodal.py

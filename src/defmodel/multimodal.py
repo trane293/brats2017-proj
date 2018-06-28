@@ -9,8 +9,8 @@ sys.setrecursionlimit(10000)
 
 from keras.optimizers import Adam
 from keras.models import Model
-from keras.layers import Input, merge, Lambda, LeakyReLU, MaxPooling2D
-from keras.layers.convolutional import Conv2D, UpSampling2D
+from keras.layers import Input, merge, Lambda, LeakyReLU, MaxPooling2D, MaxPooling3D
+from keras.layers.convolutional import Conv2D, UpSampling2D, Conv3D, UpSampling3D
 from keras import backend as K
 from keras.layers.core import Dense, Activation, Flatten
 
@@ -18,7 +18,7 @@ from src.defmodel.SpatialTransformerLayer import SpatialTransformer
 import keras
 keras.backend.common._IMAGE_DATA_FORMAT='channels_first'
 
-def get_model(inp_shape=(4, None, None, None)):
+def get_model(inp_shape=(1, None, None, None)):
     print('Creating model...')
     chn = inp_shape[0]
     print 'Channels: %d' % chn
@@ -71,58 +71,58 @@ class Multimodel(object):
 
     def encoder_maker(self, modality):
         inp = Input(shape=(self.channels, self.H, self.W), name='enc_' + modality + '_input')
-        conv = Conv2D(32, 3, padding='same', name='enc_' + modality + '_conv1')(inp)
+        conv = Conv3D(32, 3, padding='same', name='enc_' + modality + '_conv1')(inp)
         act = LeakyReLU()(conv)
-        conv = Conv2D(32, 3, padding='same', name='enc_' + modality + '_conv2')(act)
+        conv = Conv3D(32, 3, padding='same', name='enc_' + modality + '_conv2')(act)
         act1 = LeakyReLU()(conv)
 
         # downsample 1st level
-        pool = MaxPooling2D(pool_size=(2, 2))(act1)
-        conv = Conv2D(64, 3, padding='same', name='enc_' + modality + '_conv3')(pool)
+        pool = MaxPooling3D(pool_size=(2, 2, 2))(act1)
+        conv = Conv3D(64, 3, padding='same', name='enc_' + modality + '_conv3')(pool)
         act = LeakyReLU()(conv)
-        conv = Conv2D(64, 3, padding='same', name='enc_' + modality + '_conv4')(act)
+        conv = Conv3D(64, 3, padding='same', name='enc_' + modality + '_conv4')(act)
         act2 = LeakyReLU()(conv)
 
         # downsample 2nd level
-        pool = MaxPooling2D(pool_size=(2, 2))(act2)
-        conv = Conv2D(128, 3, padding='same', name='enc_' + modality + '_conv5')(pool)
+        pool = MaxPooling3D(pool_size=(2, 2, 2))(act2)
+        conv = Conv3D(128, 3, padding='same', name='enc_' + modality + '_conv5')(pool)
         act = LeakyReLU()(conv)
-        conv = Conv2D(128, 3, padding='same', name='enc_' + modality + '_conv6')(act)
+        conv = Conv3D(128, 3, padding='same', name='enc_' + modality + '_conv6')(act)
         act = LeakyReLU()(conv)
 
         # upsample 2nd level
-        ups = UpSampling2D(size=(2, 2))(act)
-        conv = Conv2D(64, 3, padding='same', name='enc_' + modality + '_conv7')(ups)
+        ups = UpSampling3D(size=(2, 2, 2))(act)
+        conv = Conv3D(64, 3, padding='same', name='enc_' + modality + '_conv7')(ups)
         skip = merge([act2, conv], mode='concat', concat_axis=1, name='enc_' + modality + '_skip1')
-        conv = Conv2D(64, 3, padding='same', name='enc_' + modality + '_conv8')(skip)
+        conv = Conv3D(64, 3, padding='same', name='enc_' + modality + '_conv8')(skip)
         act = LeakyReLU()(conv)
-        conv = Conv2D(64, 3, padding='same', name='enc_' + modality + '_conv9')(act)
+        conv = Conv3D(64, 3, padding='same', name='enc_' + modality + '_conv9')(act)
         act = LeakyReLU()(conv)
 
         # upsample 2nd level
-        ups = UpSampling2D(size=(2, 2))(act)
-        conv = Conv2D(32, 3, padding='same', name='enc_' + modality + '_conv10')(ups)
+        ups = UpSampling3D(size=(2, 2, 2))(act)
+        conv = Conv3D(32, 3, padding='same', name='enc_' + modality + '_conv10')(ups)
         skip = merge([act1, conv], mode='concat', concat_axis=1, name='enc_' + modality + '_skip2')
-        conv = Conv2D(32, 3, padding='same', name='enc_' + modality + '_conv11')(skip)
+        conv = Conv3D(32, 3, padding='same', name='enc_' + modality + '_conv11')(skip)
         act = LeakyReLU()(conv)
-        conv = Conv2D(32, 3, padding='same', name='enc_' + modality + '_conv12')(act)
+        conv = Conv3D(32, 3, padding='same', name='enc_' + modality + '_conv12')(act)
         act = LeakyReLU()(conv)
 
         conv_ld = self.latent_dim / 2 if self.common_merge == 'hemis' else self.latent_dim
-        conv = Conv2D(conv_ld, 3, padding='same', name='enc_' + modality + '_conv13')(act)
+        conv = Conv3D(conv_ld, 1, padding='same', name='enc_' + modality + '_conv13')(act)
         lr = LeakyReLU()(conv)
 
         return inp, lr
 
     def decoder_maker(self, modality):
         inp = Input(shape=(self.latent_dim, None, None), name='dec_' + modality + '_input')
-        conv = Conv2D(32, 3, padding='same', activation='relu', name='dec_' + modality + '_conv1')(inp)
-        conv = Conv2D(32, 3, padding='same', activation='relu', name='dec_' + modality + '_conv2')(conv)
+        conv = Conv3D(32, 3, padding='same', activation='relu', name='dec_' + modality + '_conv1')(inp)
+        conv = Conv3D(32, 3, padding='same', activation='relu', name='dec_' + modality + '_conv2')(conv)
         skip = merge([inp, conv], mode='concat', concat_axis=1, name='dec_' + modality + '_skip1')
-        conv = Conv2D(32, 3, padding='same', activation='relu', name='dec_' + modality + '_conv3')(skip)
-        conv = Conv2D(32, 3, padding='same', activation='relu', name='dec_' + modality + '_conv4')(conv)
+        conv = Conv3D(32, 3, padding='same', activation='relu', name='dec_' + modality + '_conv3')(skip)
+        conv = Conv3D(32, 3, padding='same', activation='relu', name='dec_' + modality + '_conv4')(conv)
         skip = merge([skip, conv], mode='concat', concat_axis=1, name='dec_' + modality + '_skip2')
-        conv = Conv2D(1, 1, padding='same', activation='sigmoid', name='dec_' + modality + '_conv5')(skip)
+        conv = Conv3D(1, 1, padding='same', activation='sigmoid', name='dec_' + modality + '_conv5')(skip)
         model = Model(input=inp, output=conv, name='decoder_' + modality)
         return model
 
@@ -391,11 +391,11 @@ def STMerge(to_merge):
 
 def tpn_maker(input_shape):
     # initial weights
-    b = np.zeros((2, 3), dtype='float32')
-    b[0, 0] = 1
-    b[1, 1] = 1
-    W = np.zeros((50, 6), dtype='float32')
-    weights = [W, b.flatten()]
+    # b = np.zeros((2, 3), dtype='float32')
+    # b[0, 0] = 1
+    # b[1, 1] = 1
+    # W = np.zeros((50, 6), dtype='float32')
+    # weights = [W, b.flatten()]
 
     # input_shape = (1, 112, 80)
 
@@ -404,16 +404,16 @@ def tpn_maker(input_shape):
 
     stacked = merge([target_input, input], mode='concat')
 
-    mp1 = MaxPooling2D(pool_size=(2, 2))(stacked)
-    conv1 = Conv2D(8, 5)(mp1)
-    mp2 = MaxPooling2D(pool_size=(2, 2))(conv1)
-    conv2 = Conv2D(8, 5)(mp2)
-    mp3 = MaxPooling2D(pool_size=(2, 2))(conv2)
-    conv3 = Conv2D(8, 5)(mp3)
+    mp1 = MaxPooling3D(pool_size=(2, 2, 2))(stacked)
+    conv1 = Conv3D(8, 5)(mp1)
+    mp2 = MaxPooling3D(pool_size=(2, 2, 2))(conv1)
+    conv2 = Conv3D(8, 5)(mp2)
+    mp3 = MaxPooling3D(pool_size=(2, 2, 2))(conv2)
+    conv3 = Conv3D(8, 5)(mp3)
     flt = Flatten()(conv3)
     d50 = Dense(50)(flt)
     act = Activation('relu')(d50)
-    theta = Dense(6, weights=weights)(act)
+    theta = Dense(6)(act)
 
     model = Model(input=[target_input, input], output=theta)
     return model
