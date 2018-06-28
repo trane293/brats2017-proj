@@ -109,7 +109,7 @@ class Multimodel(object):
         act = LeakyReLU()(conv)
 
         conv_ld = self.latent_dim / 2 if self.common_merge == 'hemis' else self.latent_dim
-        conv = Conv3D(conv_ld, 1, padding='same', name='enc_' + modality + '_conv13')(act)
+        conv = Conv3D(conv_ld, 3, padding='same', name='enc_' + modality + '_conv13')(act)
         lr = LeakyReLU()(conv)
 
         return inp, lr
