@@ -115,7 +115,7 @@ class Multimodel(object):
         return inp, lr
 
     def decoder_maker(self, modality):
-        inp = Input(shape=(self.latent_dim, None, None), name='dec_' + modality + '_input')
+        inp = Input(shape=(self.latent_dim, None, None, None), name='dec_' + modality + '_input')
         conv = Conv3D(32, 3, padding='same', activation='relu', name='dec_' + modality + '_conv1')(inp)
         conv = Conv3D(32, 3, padding='same', activation='relu', name='dec_' + modality + '_conv2')(conv)
         skip = merge([inp, conv], mode='concat', concat_axis=1, name='dec_' + modality + '_skip1')
