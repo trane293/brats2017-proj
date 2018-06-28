@@ -184,7 +184,7 @@ class Multimodel(object):
         # apply spatial transformer
         if self.spatial_transformer:
             print 'Adding a spatial transformer layer'
-            input_shape = (self.latent_dim, self.H, self.W)
+            input_shape = (self.latent_dim, self.W, self.H, self.Z)
             tpn = tpn_maker(input_shape)
             mod1 = ind_emb[0]
             aligned_ind_emb = [mod1]
