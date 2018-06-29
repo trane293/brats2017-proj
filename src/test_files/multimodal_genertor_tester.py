@@ -144,7 +144,7 @@ model = mm.model
 history = model.fit_generator(train_gen, steps_per_epoch=3,
                     epochs=1, verbose=1, callbacks=None,
                     validation_data=test_gen, validation_steps=3,
-                    class_weight=None, max_queue_size=100, workers=1,
+                    class_weight=None, max_queue_size=3, workers=1,
                     use_multiprocessing=True, shuffle=False, initial_epoch=0)
 
 print('Hello')
