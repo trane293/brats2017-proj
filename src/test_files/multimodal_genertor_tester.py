@@ -3,7 +3,7 @@ sys.path.append('..')
 from modules.training_helpers import *
 from modules.configfile import config
 from defmodel.multimodal import embedding_distance
-from modules.vizhelpercode import viewArbitraryVolume
+#from modules.vizhelpercode import viewArbitraryVolume
 import logging
 import random as random
 import optparse
