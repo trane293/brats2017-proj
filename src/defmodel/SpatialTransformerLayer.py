@@ -1,5 +1,10 @@
+import numpy as np
+import theano
+import theano.tensor as T
+
 from keras.layers.core import Layer
-import tensorflow as tf
+
+floatX = theano.config.floatX
 
 class SpatialTransformer(Layer):
     """Spatial Transformer Layer
@@ -18,153 +23,158 @@ class SpatialTransformer(Layer):
             Max Jaderberg, Karen Simonyan, Andrew Zisserman, Koray Kavukcuoglu
             Submitted on 5 Jun 2015
     .. [2]  https://github.com/skaae/transformer_network/blob/master/transformerlayer.py
-
-    .. [3]  https://github.com/EderSantana/seya/blob/keras1/seya/layers/attention.py
     """
-
-    def __init__(self,
-                 localization_net,
-                 output_size,
-                 **kwargs):
+    def __init__(self, localization_net, downsample_factor=1, return_theta=False, **kwargs):
+        self.downsample_factor = downsample_factor
         self.locnet = localization_net
-        self.output_size = output_size
+        self.return_theta = return_theta
         super(SpatialTransformer, self).__init__(**kwargs)
 
-    def build(self, input_shape):
-        self.locnet.build(input_shape)
+    def build(self, something):
+        print something
+        print self.locnet.input.type()
+        if hasattr(self, 'previous'):
+            self.locnet.set_previous(self.previous)
+        self.locnet.build()
         self.trainable_weights = self.locnet.trainable_weights
-        #self.regularizers = self.locnet.regularizers //NOT SUER ABOUT THIS, THERE IS NO MORE SUCH PARAMETR AT self.locnet
+        self.regularizers = self.locnet.regularizers
         self.constraints = self.locnet.constraints
+        self.input = self.locnet.input  # This must be T.tensor4()
 
-    def compute_output_shape(self, input_shape):
-        output_size = self.output_size
-        return (None,
-                int(output_size[0]),
-                int(output_size[1]),
-                int(input_shape[-1]))
+    @property
+    def output_shape(self):
+        input_shape = self.input_shape
+        return (None, input_shape[1],
+                int(input_shape[2] / self.downsample_factor),
+                int(input_shape[3] / self.downsample_factor))
 
-    def call(self, X, mask=None):
-        affine_transformation = self.locnet.call(X)
-        output = self._transform(affine_transformation, X, self.output_size)
-        return output
+    def get_output(self, train=False):
+        X = self.get_input(train)
+        theta = apply_model(self.locnet, X)
+        theta = theta.reshape((X.shape[0], 2, 3))
+        output = self._transform(theta, X, self.downsample_factor)
 
-    def _repeat(self, x, num_repeats):
-        ones = tf.ones((1, num_repeats), dtype='int32')
-        x = tf.reshape(x, shape=(-1,1))
-        x = tf.matmul(x, ones)
-        return tf.reshape(x, [-1])
+        if self.return_theta:
+            return theta.reshape((X.shape[0], 6))
+        else:
+            return output
 
-    def _interpolate(self, image, x, y, output_size):
-        batch_size = tf.shape(image)[0]
-        height = tf.shape(image)[1]
-        width = tf.shape(image)[2]
-        num_channels = tf.shape(image)[3]
+    @staticmethod
+    def _repeat(x, n_repeats):
+        rep = T.ones((n_repeats,), dtype='int32').dimshuffle('x', 0)
+        x = T.dot(x.reshape((-1, 1)), rep)
+        return x.flatten()
 
-        x = tf.cast(x , dtype='float32')
-        y = tf.cast(y , dtype='float32')
+    @staticmethod
+    def _interpolate(im, x, y, downsample_factor):
+        # constants
+        num_batch, height, width, channels = im.shape
+        height_f = T.cast(height, floatX)
+        width_f = T.cast(width, floatX)
+        out_height = T.cast(height_f // downsample_factor, 'int64')
+        out_width = T.cast(width_f // downsample_factor, 'int64')
+        zero = T.zeros([], dtype='int64')
+        max_y = T.cast(im.shape[1] - 1, 'int64')
+        max_x = T.cast(im.shape[2] - 1, 'int64')
 
-        height_float = tf.cast(height, dtype='float32')
-        width_float = tf.cast(width, dtype='float32')
+        # scale indices from [-1, 1] to [0, width/height]
+        x = (x + 1.0)*(width_f) / 2.0
+        y = (y + 1.0)*(height_f) / 2.0
 
-        output_height = output_size[0]
-        output_width  = output_size[1]
-
-        x = .5*(x + 1.0)*(width_float)
-        y = .5*(y + 1.0)*(height_float)
-
-        x0 = tf.cast(tf.floor(x), 'int32')
+        # do sampling
+        x0 = T.cast(T.floor(x), 'int64')
         x1 = x0 + 1
-        y0 = tf.cast(tf.floor(y), 'int32')
+        y0 = T.cast(T.floor(y), 'int64')
         y1 = y0 + 1
 
-        max_y = tf.cast(height - 1, dtype='int32')
-        max_x = tf.cast(width - 1,  dtype='int32')
-        zero = tf.zeros([], dtype='int32')
+        x0 = T.clip(x0, zero, max_x)
+        x1 = T.clip(x1, zero, max_x)
+        y0 = T.clip(y0, zero, max_y)
+        y1 = T.clip(y1, zero, max_y)
+        dim2 = width
+        dim1 = width*height
+        base = SpatialTransformer._repeat(
+            T.arange(num_batch, dtype='int32')*dim1, out_height*out_width)
+        base_y0 = base + y0*dim2
+        base_y1 = base + y1*dim2
+        idx_a = base_y0 + x0
+        idx_b = base_y1 + x0
+        idx_c = base_y0 + x1
+        idx_d = base_y1 + x1
 
-        x0 = tf.clip_by_value(x0, zero, max_x)
-        x1 = tf.clip_by_value(x1, zero, max_x)
-        y0 = tf.clip_by_value(y0, zero, max_y)
-        y1 = tf.clip_by_value(y1, zero, max_y)
+        # use indices to lookup pixels in the flat
+        #  image and restore channels dim
+        im_flat = im.reshape((-1, channels))
+        Ia = im_flat[idx_a]
+        Ib = im_flat[idx_b]
+        Ic = im_flat[idx_c]
+        Id = im_flat[idx_d]
 
-        flat_image_dimensions = width*height
-        pixels_batch = tf.range(batch_size)*flat_image_dimensions
-        flat_output_dimensions = output_height*output_width
-        base = self._repeat(pixels_batch, flat_output_dimensions)
-        base_y0 = base + y0*width
-        base_y1 = base + y1*width
-        indices_a = base_y0 + x0
-        indices_b = base_y1 + x0
-        indices_c = base_y0 + x1
-        indices_d = base_y1 + x1
-
-        flat_image = tf.reshape(image, shape=(-1, num_channels))
-        flat_image = tf.cast(flat_image, dtype='float32')
-        pixel_values_a = tf.gather(flat_image, indices_a)
-        pixel_values_b = tf.gather(flat_image, indices_b)
-        pixel_values_c = tf.gather(flat_image, indices_c)
-        pixel_values_d = tf.gather(flat_image, indices_d)
-
-        x0 = tf.cast(x0, 'float32')
-        x1 = tf.cast(x1, 'float32')
-        y0 = tf.cast(y0, 'float32')
-        y1 = tf.cast(y1, 'float32')
-
-        area_a = tf.expand_dims(((x1 - x) * (y1 - y)), 1)
-        area_b = tf.expand_dims(((x1 - x) * (y - y0)), 1)
-        area_c = tf.expand_dims(((x - x0) * (y1 - y)), 1)
-        area_d = tf.expand_dims(((x - x0) * (y - y0)), 1)
-        output = tf.add_n([area_a*pixel_values_a,
-                           area_b*pixel_values_b,
-                           area_c*pixel_values_c,
-                           area_d*pixel_values_d])
+        # and finanly calculate interpolated values
+        x0_f = T.cast(x0, floatX)
+        x1_f = T.cast(x1, floatX)
+        y0_f = T.cast(y0, floatX)
+        y1_f = T.cast(y1, floatX)
+        wa = ((x1_f-x) * (y1_f-y)).dimshuffle(0, 'x')
+        wb = ((x1_f-x) * (y-y0_f)).dimshuffle(0, 'x')
+        wc = ((x-x0_f) * (y1_f-y)).dimshuffle(0, 'x')
+        wd = ((x-x0_f) * (y-y0_f)).dimshuffle(0, 'x')
+        output = T.sum([wa*Ia, wb*Ib, wc*Ic, wd*Id], axis=0)
         return output
 
-    def _meshgrid(self, height, width):
-        x_linspace = tf.linspace(-1., 1., width)
-        y_linspace = tf.linspace(-1., 1., height)
-        x_coordinates, y_coordinates = tf.meshgrid(x_linspace, y_linspace)
-        x_coordinates = tf.reshape(x_coordinates, [-1])
-        y_coordinates = tf.reshape(y_coordinates, [-1])
-        ones = tf.ones_like(x_coordinates)
-        indices_grid = tf.concat([x_coordinates, y_coordinates, ones], 0)
-        return indices_grid
+    @staticmethod
+    def _linspace(start, stop, num):
+        # produces results identical to:
+        # np.linspace(start, stop, num)
+        start = T.cast(start, floatX)
+        stop = T.cast(stop, floatX)
+        num = T.cast(num, floatX)
+        step = (stop-start)/(num-1)
+        return T.arange(num, dtype=floatX)*step+start
 
-    def _transform(self, affine_transformation, input_shape, output_size):
-        batch_size = tf.shape(input_shape)[0]
-        height = tf.shape(input_shape)[1]
-        width = tf.shape(input_shape)[2]
-        num_channels = tf.shape(input_shape)[3]
+    @staticmethod
+    def _meshgrid(height, width):
+        # This should be equivalent to:
+        #  x_t, y_t = np.meshgrid(np.linspace(-1, 1, width),
+        #                         np.linspace(-1, 1, height))
+        #  ones = np.ones(np.prod(x_t.shape))
+        #  grid = np.vstack([x_t.flatten(), y_t.flatten(), ones])
+        x_t = T.dot(T.ones((height, 1)),
+                    SpatialTransformer._linspace(-1.0, 1.0, width).dimshuffle('x', 0))
+        y_t = T.dot(SpatialTransformer._linspace(-1.0, 1.0, height).dimshuffle(0, 'x'),
+                    T.ones((1, width)))
 
-        affine_transformation = tf.reshape(affine_transformation, shape=(batch_size,2,3))
+        x_t_flat = x_t.reshape((1, -1))
+        y_t_flat = y_t.reshape((1, -1))
+        ones = T.ones_like(x_t_flat)
+        grid = T.concatenate([x_t_flat, y_t_flat, ones], axis=0)
+        return grid
 
-        affine_transformation = tf.reshape(affine_transformation, (-1, 2, 3))
-        affine_transformation = tf.cast(affine_transformation, 'float32')
+    @staticmethod
+    def _transform(theta, input, downsample_factor):
+        num_batch, num_channels, height, width = input.shape
+        theta = theta.reshape((num_batch, 2, 3))  # T.reshape(theta, (-1, 2, 3))
 
-        width = tf.cast(width, dtype='float32')
-        height = tf.cast(height, dtype='float32')
-        output_height = output_size[0]
-        output_width = output_size[1]
-        indices_grid = self._meshgrid(output_height, output_width)
-        indices_grid = tf.expand_dims(indices_grid, 0)
-        indices_grid = tf.reshape(indices_grid, [-1]) # flatten?
+        # grid of (x_t, y_t, 1), eq (1) in ref [1]
+        height_f = T.cast(height, floatX)
+        width_f = T.cast(width, floatX)
+        out_height = T.cast(height_f // downsample_factor, 'int64')
+        out_width = T.cast(width_f // downsample_factor, 'int64')
+        grid = SpatialTransformer._meshgrid(out_height, out_width)
 
-        indices_grid = tf.tile(indices_grid, tf.stack([batch_size]))
-        indices_grid = tf.reshape(indices_grid, (batch_size, 3, -1))
+        # Transform A x (x_t, y_t, 1)^T -> (x_s, y_s)
+        T_g = T.dot(theta, grid)
+        x_s, y_s = T_g[:, 0], T_g[:, 1]
+        x_s_flat = x_s.flatten()
+        y_s_flat = y_s.flatten()
 
-        transformed_grid = tf.matmul(affine_transformation, indices_grid)
-        x_s = tf.slice(transformed_grid, [0, 0, 0], [-1, 1, -1])
-        y_s = tf.slice(transformed_grid, [0, 1, 0], [-1, 1, -1])
-        x_s_flatten = tf.reshape(x_s, [-1])
-        y_s_flatten = tf.reshape(y_s, [-1])
+        # dimshuffle input to  (bs, height, width, channels)
+        input_dim = input.dimshuffle(0, 2, 3, 1)
+        input_transformed = SpatialTransformer._interpolate(
+            input_dim, x_s_flat, y_s_flat,
+            downsample_factor)
 
-        transformed_image = self._interpolate(input_shape,
-                                                x_s_flatten,
-                                                y_s_flatten,
-                                                output_size)
-
-        transformed_image = tf.reshape(transformed_image, shape=(batch_size,
-                                                                output_height,
-                                                                output_width,
-                                                                num_channels))
-        return transformed_image
-
+        output = T.reshape(input_transformed,
+                           (num_batch, out_height, out_width, num_channels))
+        output = output.dimshuffle(0, 3, 1, 2)
+        return output
