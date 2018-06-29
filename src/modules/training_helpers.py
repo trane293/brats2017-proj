@@ -261,7 +261,7 @@ def printPercentages(patches):
 
 
 def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False, gen_name='Training',
-                           applyNorm=True, augment=None, generate_list=False):
+                           applyNorm=True, augment=None, generate_list=False, num_emb=None, output_modalities=None):
     '''
     Generate patch batches, apply augmentation, and create multiple masks for multi-class segmentation
 
@@ -293,6 +293,11 @@ def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False,
 
                 labels = [1,2,4]
 
+                # save individual masks
+                # 1 = necrotic + non-enhancing
+                # 2 = edema
+                # 4 = enhancing
+
                 for idx, i in enumerate(labels):
                     # inside the channel 'i' in y_batch_channel_wise, set all voxels which have label 'i' equal to 'i'.
                     # in the zeroth channel, find the voxels which are 1, and set all those corresponding voxels as 1
@@ -307,7 +312,23 @@ def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False,
                     yield x_batch, y_batch_channel_wise
                 else:
                     ps = config['patch_size']
+
                     x_patches_list = [x_batch[:, i, ...].reshape(-1, 1, ps[0], ps[1], ps[2]) for i in range(0, 4)]
                     y_patches_list = [y_batch_channel_wise[:, i, ...].reshape(-1, 1, ps[0], ps[1], ps[2]) for i in range(0, 3)]
 
-                    yield x_patches_list, y_patches_list
+                    # total 15 volumes
+                    y_patches_expanded = [select_for_mod(y_patches_list, mod) for mod in output_modalities
+                                          for i in range(num_emb)]
+
+                    # add 2 dummy volumes
+                    y_patches_expanded += [np.zeros(shape=y_patches_expanded[0].shape) for i in range(2)]
+
+                    yield x_patches_list, y_patches_expanded
+
+def select_for_mod(patch_list, mod):
+    if mod == 'MASK_nec_ne':
+        return patch_list[0]
+    elif mod == 'MASK_edema':
+        return patch_list[1]
+    elif mod == 'MASK_enhancing':
+        return patch_list[2]

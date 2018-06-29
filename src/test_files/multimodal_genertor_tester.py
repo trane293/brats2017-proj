@@ -79,14 +79,19 @@ test_indices = indices[train_end:]
 
 # ======================================================================================
 batch_size = 10
-augment = ['permute', 'remove_seq']
-train_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
-                                   t_i=train_indices, mean_var=mean_var, batch_size=batch_size, debug_mode=False,
-                                   applyNorm=False, augment=augment, generate_list=True)
+augment = ['permute']
+num_emb = 4 + 1 # 4 = number of input modalities
+output_modalities = ['MASK_edema', 'MASK_enhancing', 'MASK_nec_ne']
 
-test_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
-                                  t_i=test_indices, mean_var=mean_var, batch_size=batch_size, debug_mode=True,
-                                  applyNorm=False, augment=augment)
+train_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks, gen_name='train'
+                                   t_i=train_indices, mean_var=mean_var, batch_size=batch_size, debug_mode=False,
+                                   applyNorm=False, augment=augment, generate_list=True, num_emb=num_emb,
+                                   output_modalities=output_modalities)
+
+test_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks, gen_name='test',
+                                  t_i=test_indices, mean_var=mean_var, batch_size=batch_size, debug_mode=False,
+                                  applyNorm=False, augment=augment, generate_list=True, num_emb=num_emb,
+                                  output_modalities=output_modalities)
 
 # def embedding_distance(y_true, y_pred):
 #     return K.var(y_pred, axis=1)
@@ -94,27 +99,49 @@ test_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
 custom_obj = {
     'embedding_distance': embedding_distance
 }
-model = load_model('/home/anmol/model.h5', custom_objects=custom_obj)
 
-count = 0
-for x_patches, y_patches in train_gen:
-    # print(x_patches.shape, y_patches.shape)
+import defmodel.multimodal
 
-    viewArbitraryVolume(x_patches[0][0,0])
-    viewArbitraryVolume(x_patches[1][0,0])
-    viewArbitraryVolume(x_patches[2][0,0])
-    viewArbitraryVolume(x_patches[3][0,0])
+mm = defmodel.multimodal.get_model()
 
-    viewArbitraryVolume(y_patches[0][0,0])
-    viewArbitraryVolume(y_patches[1][0,0])
-    viewArbitraryVolume(y_patches[2][0,0])
+model = mm.model
+#
+# count = 0
+# for x_patches, y_patches in train_gen:
+#     # print(x_patches.shape, y_patches.shape)
+#
+#     # viewArbitraryVolume(x_patches[0][0,0])
+#     # viewArbitraryVolume(x_patches[1][0,0])
+#     # viewArbitraryVolume(x_patches[2][0,0])
+#     # viewArbitraryVolume(x_patches[3][0,0])
+#     #
+#     # viewArbitraryVolume(y_patches[0][0,0])
+#     # viewArbitraryVolume(y_patches[1][0,0])
+#     # viewArbitraryVolume(y_patches[2][0,0])
+#
+#     if count == 0:
+#         break
+#     count += 1
+# print('Hello')
+# num_emb = 4 + 1 # 4 = number of input modalities
+# output_modalities = ['MASK_edema', 'MASK_enhancing', 'MASK_nec_ne']
+#
+# def select_for_mod(patch_list, mod):
+#     if mod == 'MASK_nec_ne':
+#         return patch_list[0]
+#     elif mod == 'MASK_edema':
+#         return patch_list[1]
+#     elif mod == 'MASK_enhancing':
+#         return patch_list[2]
+#
+# # total 15 volumes
+# y_patches_expanded = [select_for_mod(y_patches, mod) for mod in range(output_modalities)
+#                      for i in range(num_emb)]
+#
+# # add 2 dummy volumes
+# y_patches_expanded += [np.zeros(shape=y_patches_expanded[0].shape) for i in range(2)]
 
-    if count == 0:
-        break
-    count += 1
-print('Hello')
-
-model.fit_generator(train_gen, steps_per_epoch=3,
+history = model.fit_generator(train_gen, steps_per_epoch=3,
                     epochs=1, verbose=1, callbacks=None,
                     validation_data=test_gen, validation_steps=3,
                     class_weight=None, max_queue_size=100, workers=1,
