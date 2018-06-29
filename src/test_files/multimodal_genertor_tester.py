@@ -83,7 +83,7 @@ augment = ['permute']
 num_emb = 4 + 1 # 4 = number of input modalities
 output_modalities = ['MASK_edema', 'MASK_enhancing', 'MASK_nec_ne']
 
-train_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks, gen_name='train'
+train_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks, gen_name='train',
                                    t_i=train_indices, mean_var=mean_var, batch_size=batch_size, debug_mode=False,
                                    applyNorm=False, augment=augment, generate_list=True, num_emb=num_emb,
                                    output_modalities=output_modalities)
