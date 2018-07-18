@@ -72,11 +72,11 @@ config['batch_size'] = 1 # how many images to load at once in the generator
 config['cropping_coords'] = [29, 223, 41, 196, 0, 148] # coordinates used to crop the volumes, this is generated using the notebook checkLargestCropSize.ipynb
 config['size_after_cropping'] = [194, 155, 148] # set this if you set the above variable. Calculate this using the notebook again.
 
-config['data_split'] = {'train': 97,
-                        'test': 3}
+config['data_split'] = {'train': 98,
+                        'test': 2}
 
 config['std_scale_range'] = [6] # [4,6,8,10] scale the standard deviation for path generation process to allow patches from far off regions
-config['num_patches_per_patient'] = 2 # number of patches to generate for a single patient
+config['num_patches_per_patient'] = 50 # number of patches to generate for a single patient
 config['patch_size'] = [64, 64, 64] # size of patch to extract
 config['patch_input_shape'] = [4] + config['patch_size']
 config['gen_patches_from'] = 'original' # generate patches from the cropped version of the database or original.
