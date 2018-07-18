@@ -231,7 +231,7 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
 
             printPercentages(y_patches)
 
-            yield x_patches, y_patches
+            yield x_patches, y_patches, epoch_count
         epoch_count += 1
 
 
@@ -276,7 +276,7 @@ def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False,
     :return:
     '''
     while 1:
-        for x_patches, y_patches in generate_patches(X, Y, t_i, mean_var=mean_var, debug_mode=debug_mode,
+        for x_patches, y_patches, epoch_count in generate_patches(X, Y, t_i, mean_var=mean_var, debug_mode=debug_mode,
                                                      gen_name=gen_name, applyNorm=applyNorm):
 
             for _t in range(0, x_patches.shape[0], batch_size):
@@ -306,7 +306,8 @@ def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False,
 
                 # add augmentation code here
                 if augment != None:
-                    x_batch, y_batch_channel_wise = augment_data(x_batch, y_batch_channel_wise, augment=augment)
+                    x_batch, y_batch_channel_wise = augment_data(x_batch, y_batch_channel_wise, augment=augment,
+                                                                 epoch=epoch_count)
 
                 if generate_list == False:
                     yield x_batch, y_batch_channel_wise

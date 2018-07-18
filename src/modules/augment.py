@@ -65,36 +65,47 @@ def random_permutation_x_y(x_data, y_data):
     return permute_data(x_data, key), permute_data(y_data, key)
 
 
-def remove_sequence(x_data):
+def remove_sequence(x_data, epoch):
     # randomly remove a sequence from the x_data
     # remember nothing needs to be for the y_data, since that is the ground truth and we want network to learn it.
     # for normalized data with zero mean and unit variance, this is equivalent to imputing the
     # sequence with all zeros.
     # Set all values of a random sequence = 0
 
-    # assuming a batch will be coming with first dimension = batch size. So we permute for all examples in this batch
-    assert (len(x_data.shape) > 4), 'Batch size incorrect'
-    sequences = [0,1,2,3]
+    # Warmup epochs = 10
+    # only do something if we're past 10 epochs
+    if epoch > 10:
+        sequences = [0, 1, 2, 3]
+        for curr_eg in range(x_data.shape[0]):
+            # there is a 50% chance that a sequence will be removed
+            chance = random.uniform(0, 1)
+            if chance > 0.5:
+                # we are going to remove one or many sequences
+                # there is a 70% chance only one sequence is removed.
+                # there is 20% chance two sequences are removed
+                # there is 10% chance of three sequences being removed
 
-    for curr_eg in range(x_data.shape[0]):
-        r = random.choice([0, 1])
-        if r == 1:
-            # how many sequences to remove
-            hm = random.randint(1, 3)
-            rm_seq = random.sample(sequences, hm)
-            for curr_seq in rm_seq:
-                x_data[curr_eg,curr_seq,] = 0.0
+                hm = random.uniform(0, 1)
+                if hm < 0.7: # remove one sequence
+                    rm_seq = random.sample(sequences, 1)
+                elif hm > 0.7 and  hm < 0.9: # remove two sequences
+                    rm_seq = random.sample(sequences, 2)
+                elif hm > 0.9: # remove three sequences
+                    rm_seq = random.sample(sequences, 3)
+
+                for curr_seq in rm_seq:
+                    x_data[curr_eg,curr_seq,] = 0.0
 
     return x_data
 
 
-def augment_data(x_data, y_data, augment=None):
+def augment_data(x_data, y_data, augment=None, epoch=0):
     # assuming a batch will be coming with first dimension = batch size. So we permute for all examples in this batch
     assert (len(x_data.shape) > 4) and (len(y_data.shape) > 4), 'Batch size incorrect'
     if 'permute' in augment:
         for curr_eg in range(x_data.shape[0]):
             x_data[curr_eg,], y_data[curr_eg,] = random_permutation_x_y(x_data[curr_eg,], y_data[curr_eg,])
     if 'remove_seq' in augment:
-        x_data = remove_sequence(x_data)
+        x_data = remove_sequence(x_data, epoch=epoch)
 
     return x_data, y_data
