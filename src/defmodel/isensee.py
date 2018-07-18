@@ -138,9 +138,9 @@ def isensee2017_model(input_shape=(4, 128, 128, 128), n_base_filters=16, depth=5
 
     if include_label_wise_dice_coefficients:
         lab_names = {
-            0: 'Necrotic',
-            1: 'Edema',
-            2: 'Enhancing'
+            0: 'Whole_Tumor',
+            1: 'Enhancing',
+            2: 'Tumor_Core'
         }
 
         label_wise_dice_metrics = [get_label_dice_coefficient_function(index, name) for index, name in
