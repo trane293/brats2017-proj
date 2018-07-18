@@ -44,7 +44,7 @@ options, remainder = parser.parse_args()
 # --------------------------------------------------------------------------------------
 # open mean and variance dictionary
 
-mean_var = pickle.load(open(config['saveMeanVarFilepath'+options.grade.upper()], 'rb'))
+mean_var = pickle.load(open(config['saveMeanVarCombinedData'], 'rb'))
 
 # open new database with cropped images
 
