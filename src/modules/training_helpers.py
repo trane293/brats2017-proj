@@ -308,7 +308,7 @@ def generate_patch_batches(X, Y, t_i, mean_var, batch_size=10, debug_mode=False,
                     2: [1, 4]
                 }
 
-                for idx, labs in enumerate(label_dict):
+                for idx, labs in label_dict.items():
                     # inside the channel 'i' in y_batch_channel_wise, set all voxels which have label 'i' equal to 'i'.
                     # in the zeroth channel, find the voxels which are 1, and set all those corresponding voxels as 1
                     # there's no seperate  channel  for background class.

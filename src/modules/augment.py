@@ -83,16 +83,16 @@ def remove_sequence(x_data, epoch):
             chance = random.uniform(0, 1)
             if chance > 0.5:
                 # we are going to remove one or many sequences
-                # there is a 70% chance only one sequence is removed.
-                # there is 20% chance two sequences are removed
-                # there is 10% chance of three sequences being removed
+                # there is a 85% chance only one sequence is removed.
+                # there is 10% chance two sequences are removed
+                # there is 5% chance of three sequences being removed
 
                 hm = random.uniform(0, 1)
-                if hm < 0.7: # remove one sequence
+                if hm < 0.85: # remove one sequence
                     rm_seq = random.sample(sequences, 1)
-                elif hm > 0.7 and  hm < 0.9: # remove two sequences
+                elif hm >= 0.85 and  hm < 0.95: # remove two sequences
                     rm_seq = random.sample(sequences, 2)
-                elif hm > 0.9: # remove three sequences
+                elif hm >= 0.95: # remove three sequences
                     rm_seq = random.sample(sequences, 3)
 
                 for curr_seq in rm_seq:
