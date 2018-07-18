@@ -1,6 +1,8 @@
 import numpy as np
 import random, itertools
-
+from configfile import config
+random.seed(config['seed'])
+np.random.seed(config['seed'])
 
 def generate_permutation_keys():
     """

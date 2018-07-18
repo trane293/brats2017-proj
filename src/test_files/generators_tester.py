@@ -8,8 +8,8 @@ import optparse
 import cPickle as pickle
 import h5py
 import numpy as np
-random.seed(1337)
-np.random.seed(1337)
+random.seed(config['seed'])
+np.random.seed(config['seed'])
 
 logging.basicConfig(level=logging.DEBUG)
 try:
@@ -83,13 +83,13 @@ test_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
                                   applyNorm=False, augment=augment)
 
 count = 0
-for x_patches, y_patches in test_gen:
+for x_patches, y_patches, epoch in test_gen:
     print(x_patches.shape, y_patches.shape)
     if count > 20:
         break
 
 count = 0
-for x_patches, y_patches in train_gen:
+for x_patches, y_patches,  epoch in train_gen:
     print(x_patches.shape, y_patches.shape)
     if count > 20:
         break
