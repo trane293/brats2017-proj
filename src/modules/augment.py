@@ -103,16 +103,16 @@ def remove_sequence(x_data, epoch):
 
     return x_data
 
-def addNoise(x_data):
+def add_noise(x_data):
     global mean_var
     for curr_eg in range(x_data.shape[0]):
         chance = random.uniform(0, 1)
         if chance > 0.7:
             for each_mod in range(0, 4):
                 x_data[curr_eg,each_mod,] = x_data[curr_eg,each_mod,] + np.random.normal(loc=mean_var['mn'][each_mod],
-                                                                                         scale=np.sqrt(mean_var['var'][each_mod])/15,
+                                                                                         scale=np.sqrt(mean_var['var'][each_mod])/20,
                                                                                          size=np.shape(x_data[curr_eg,each_mod,]))
-    return x_patches_noisy
+    return x_data
 
 def augment_data(x_data, y_data, augment=None, epoch=0):
     # assuming a batch will be coming with first dimension = batch size. So we permute for all examples in this batch
