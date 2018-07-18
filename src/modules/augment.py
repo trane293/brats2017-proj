@@ -1,6 +1,7 @@
 import numpy as np
 import random, itertools
 from configfile import config
+import cPickle as pickle
 random.seed(config['seed'])
 np.random.seed(config['seed'])
 
