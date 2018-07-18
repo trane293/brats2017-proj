@@ -73,7 +73,7 @@ test_indices = indices[train_end:]
 
 # ======================================================================================
 batch_size = 10
-augment = ['permute', 'remove_seq', 'add_noise']
+augment = ['permute', 'remove_seq', 'add_noise', 'add_blur']
 train_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
                                    t_i=train_indices, mean_var=mean_var, batch_size=batch_size, debug_mode=True,
                                    applyNorm=False, augment=augment)

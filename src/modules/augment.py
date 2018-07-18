@@ -2,6 +2,7 @@ import numpy as np
 import random, itertools
 from configfile import config
 import cPickle as pickle
+from scipy.ndimage.filters import gaussian_filter
 random.seed(config['seed'])
 np.random.seed(config['seed'])
 
@@ -104,14 +105,36 @@ def remove_sequence(x_data, epoch):
     return x_data
 
 def add_noise(x_data):
+    '''
+    There is a 30% chance that a particular patch will be added noise to.
+    :param x_data:
+    :return:
+    '''
     global mean_var
     for curr_eg in range(x_data.shape[0]):
         chance = random.uniform(0, 1)
         if chance > 0.7:
+            mean_divider = random.uniform(1, 20)
+            std_divider = random.uniform(15, 30)
             for each_mod in range(0, 4):
-                x_data[curr_eg,each_mod,] = x_data[curr_eg,each_mod,] + np.random.normal(loc=mean_var['mn'][each_mod],
-                                                                                         scale=np.sqrt(mean_var['var'][each_mod])/20,
+                x_data[curr_eg,each_mod,] = x_data[curr_eg,each_mod,] + np.random.normal(loc=mean_var['mn'][each_mod]/mean_divider,
+                                                                                         scale=np.sqrt(mean_var['var'][each_mod])/std_divider,
                                                                                          size=np.shape(x_data[curr_eg,each_mod,]))
+    return x_data
+
+
+def add_blur(x_data):
+    '''
+    There is a 50% chance that a particular patch will be blurred.
+    :param x_data:
+    :return:
+    '''
+    for curr_eg in range(x_data.shape[0]):
+        chance = random.uniform(0, 1)
+        if chance > 0.5:
+            sigma = random.uniform(0.3, 0.7)
+            x_data[curr_eg] = gaussian_filter(x_data[curr_eg,], sigma=sigma)
+
     return x_data
 
 def augment_data(x_data, y_data, augment=None, epoch=0):
@@ -122,6 +145,8 @@ def augment_data(x_data, y_data, augment=None, epoch=0):
             x_data[curr_eg,], y_data[curr_eg,] = random_permutation_x_y(x_data[curr_eg,], y_data[curr_eg,])
     if 'add_noise' in augment:
         x_data = add_noise(x_data)
+    if 'add_blur' in augment:
+        x_data = add_blur(x_data)
     if 'remove_seq' in augment:
         x_data = remove_sequence(x_data, epoch=epoch)
 

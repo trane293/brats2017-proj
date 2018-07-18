@@ -223,8 +223,10 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
                     x_patches[_t,...] = x[:, t[0]:t[1], t[2]:t[3], t[4]:t[5]]
                     y_patches[_t,...] = y[t[0]:t[1], t[2]:t[3], t[4]:t[5]]
                     if debug_mode == True:
+                        # slice_idx for x_patches need to be 2 because its shape is (4,x,y,z)
                         viewArbitraryVolume(x_patches[_t], slice_idx=2, modality=1)
-                        viewArbitraryVolume(y_patches[_t], slice_idx=2, modality=1)
+                        # slice_idx for y_patches need to be 1 because its shape is (x,y,z)
+                        viewArbitraryVolume(y_patches[_t], slice_idx=1, modality=1)
                 else:
                     x_patches[_t, ...] = x[t[0]:t[1], t[2]:t[3], t[4]:t[5], :]
                     y_patches[_t, ...] = y[t[0]:t[1], t[2]:t[3], t[4]:t[5]]
