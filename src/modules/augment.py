@@ -201,7 +201,7 @@ def shear_data(x_data, y_data):
     for curr_eg in range(x_data.shape[0]):
         chance = random.uniform(0, 1)
         if chance < 0.25:
-            angle = (random.random() - 0.5) * 0.8 * np.pi
+            angle = (random.random() - 0.5) * 0.4 * np.pi
             direct = np.random.random(3) - 0.5
             point = list(np.array(config['patch_size'], copy=True) / 2)
             normal = np.cross(direct, np.random.random(3))
