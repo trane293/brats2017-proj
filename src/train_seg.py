@@ -209,23 +209,23 @@ total_per_epoch_training = (len(train_indices) * config['num_patches_per_patient
 total_per_epoch_testing = (len(test_indices) * config['num_patches_per_patient'] / batch_size)
 
 augment = []
-if options.permute == True:
+if options.permute:
     logger.info('Running training with remove_sequence=True')
     augment.append('remove_seq')
 
-if options.remove_seq == True:
+if options.remove_seq:
     logger.info('Running training with remove_sequence=True')
     augment.append('remove_seq')
 
-if options.add_noise == True:
+if options.add_noise:
     logger.info('Running training with add_noise=True')
     augment.append('add_noise')
 
-if options.add_blur == True:
+if options.add_blur:
     logger.info('Running training with add_blur=True')
     augment.append('add_blur')
 
-if options.affine == True:
+if options.affine:
     logger.info('Running training with add_affine=True')
     augment.append('affine')
 
