@@ -3,6 +3,9 @@ import random, itertools
 from configfile import config
 import cPickle as pickle
 from scipy.ndimage.filters import gaussian_filter
+from scipy.ndimage import affine_transform
+from transformations import translation_matrix, shear_matrix, scale_matrix
+
 random.seed(config['seed'])
 np.random.seed(config['seed'])
 
@@ -125,17 +128,95 @@ def add_noise(x_data):
 
 def add_blur(x_data):
     '''
-    There is a 50% chance that a particular patch will be blurred.
+    There is a 25% chance that a particular patch will be blurred.
     :param x_data:
     :return:
     '''
     for curr_eg in range(x_data.shape[0]):
         chance = random.uniform(0, 1)
-        if chance > 0.5:
+        if chance < 0.25:
             sigma = random.uniform(0.3, 0.7)
             x_data[curr_eg] = gaussian_filter(x_data[curr_eg,], sigma=sigma)
 
     return x_data
+
+def translate_data(x_data, y_data):
+    '''
+    There is a 25% chance that translation operation will be performed.
+    :param x_data:
+    :param y_data:
+    :return:
+    '''
+    for curr_eg in range(x_data.shape[0]):
+        chance = random.uniform(0, 1)
+        if chance < 0.25:
+            dx = random.randint(10, 40)
+            dy = random.randint(10, 40)
+            dz = random.randint(10, 40)
+            T = translation_matrix([dx, dy, dz])
+
+            # transform the x_data
+            for each_mod in range(0,4):
+                x_data[curr_eg, each_mod] = affine_transform(x_data[curr_eg, each_mod], T, order=1, prefilter=False)
+
+            # transform the y_data
+            for each_label in range(0,3):
+                y_data[curr_eg, each_label] = affine_transform(y_data[curr_eg, each_label], T, order=1, prefilter=False)
+
+    return x_data, y_data
+
+
+def scale_data(x_data, y_data):
+    '''
+    There is a 25% chance that scaling operation will be performed.
+    :param x_data:
+    :param y_data:
+    :return:
+    '''
+    for curr_eg in range(x_data.shape[0]):
+        chance = random.uniform(0, 1)
+        if chance < 0.25:
+            origin = list(np.array(config['patch_size'], copy=True) / 2)
+            factor = random.uniform(0.5, 1.5)
+            S = scale_matrix(factor, origin=origin)
+
+            # transform the x_data
+            for each_mod in range(0, 4):
+                x_data[curr_eg, each_mod] = affine_transform(x_data[curr_eg, each_mod], S, order=1, prefilter=False)
+
+            # transform the y_data
+            for each_label in range(0, 3):
+                y_data[curr_eg, each_label] = affine_transform(y_data[curr_eg, each_label], S, order=1, prefilter=False)
+
+    return x_data, y_data
+
+
+def shear_data(x_data, y_data):
+    '''
+    There is a 25% chance that scaling operation will be performed.
+    :param x_data:
+    :param y_data:
+    :return:
+    '''
+    for curr_eg in range(x_data.shape[0]):
+        chance = random.uniform(0, 1)
+        if chance < 0.25:
+            angle = (random.random() - 0.5) * 4 * np.pi
+            direct = np.random.random(3) - 0.5
+            point = list(np.array(config['patch_size'], copy=True) / 2)
+            normal = np.cross(direct, np.random.random(3))
+            S = shear_matrix(angle, direct, point, normal)
+
+            # transform the x_data
+            for each_mod in range(0, 4):
+                x_data[curr_eg, each_mod] = affine_transform(x_data[curr_eg, each_mod], S, order=1, prefilter=False)
+
+            # transform the y_data
+            for each_label in range(0, 3):
+                y_data[curr_eg, each_label] = affine_transform(y_data[curr_eg, each_label], S, order=1, prefilter=False)
+
+    return x_data,  y_data
+
 
 def augment_data(x_data, y_data, augment=None, epoch=0):
     # assuming a batch will be coming with first dimension = batch size. So we permute for all examples in this batch
@@ -149,5 +230,9 @@ def augment_data(x_data, y_data, augment=None, epoch=0):
         x_data = add_blur(x_data)
     if 'remove_seq' in augment:
         x_data = remove_sequence(x_data, epoch=epoch)
+    if 'affine' in augment:
+        x_data, y_data = translate_data(x_data, y_data)
+        x_data, y_data = scale_data(x_data, y_data)
+        x_data, y_data = shear_data(x_data, y_data)
 
     return x_data, y_data
