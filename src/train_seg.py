@@ -98,13 +98,26 @@ parser.add_option('--rs', '--remove-seq',
                   help='Enable mean imputation based data augmentation'
                   )
 
-parser.add_option('--n', '--add-noise',
+parser.add_option('--an', '--add-noise',
                   dest="add_noise",
                   action="store_true",
                   default=False,
                   help='Enable noise addition based data augmentation'
                   )
 
+parser.add_option('--ab', '--add-blur',
+                  dest="add_blur",
+                  action="store_true",
+                  default=False,
+                  help='Enable blurring of patches during data augmentation'
+                  )
+
+parser.add_option('--af', '--affine',
+                  dest="affine",
+                  action="store_true",
+                  default=False,
+                  help='Enable affine transforms translation, scaling and shearing during data augmentation'
+                  )
 
 options, remainder = parser.parse_args()
 
@@ -192,9 +205,18 @@ augment = ['permute']
 if options.remove_seq == True:
     logger.info('Running training with remove_sequence=True')
     augment.append('remove_seq')
+
 if options.add_noise == True:
     logger.info('Running training with add_noise=True')
     augment.append('add_noise')
+
+if options.add_blur == True:
+    logger.info('Running training with add_blur=True')
+    augment.append('add_blur')
+
+if options.affine == True:
+    logger.info('Running training with add_affine=True')
+    augment.append('affine')
 
 train_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
                                    t_i=train_indices, mean_var=mean_var, batch_size=batch_size, gen_name='Training',
