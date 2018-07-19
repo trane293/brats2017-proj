@@ -150,9 +150,9 @@ def translate_data(x_data, y_data):
     for curr_eg in range(x_data.shape[0]):
         chance = random.uniform(0, 1)
         if chance < 0.25:
-            dx = random.randint(10, 40)
-            dy = random.randint(10, 40)
-            dz = random.randint(10, 40)
+            dx = random.randint(1, 10)
+            dy = random.randint(1, 10)
+            dz = random.randint(1, 10)
             T = translation_matrix([dx, dy, dz])
 
             # transform the x_data
@@ -177,7 +177,7 @@ def scale_data(x_data, y_data):
         chance = random.uniform(0, 1)
         if chance < 0.25:
             origin = list(np.array(config['patch_size'], copy=True) / 2)
-            factor = random.uniform(0.5, 1.5)
+            factor = random.uniform(0.7, 1.3)
             S = scale_matrix(factor, origin=origin)
 
             # transform the x_data
@@ -201,7 +201,7 @@ def shear_data(x_data, y_data):
     for curr_eg in range(x_data.shape[0]):
         chance = random.uniform(0, 1)
         if chance < 0.25:
-            angle = (random.random() - 0.5) * 4 * np.pi
+            angle = (random.random() - 0.5) * np.pi
             direct = np.random.random(3) - 0.5
             point = list(np.array(config['patch_size'], copy=True) / 2)
             normal = np.cross(direct, np.random.random(3))
