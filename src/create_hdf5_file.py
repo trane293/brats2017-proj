@@ -90,7 +90,13 @@ def main():
     # hdf5_file_main = createHDF5File(config)
     hdf5_file_main = h5py.File(config['hdf5_filepath_prefix'], mode='a')
     # Go inside the "original_data" parent directory.
+    # we need to create the validation data dataset again since the shape has changed.
     hdf5_file = hdf5_file_main['original_data']
+    del hdf5_file['validation_data']
+    del hdf5_file['validation_data_pat_name']
+    # Validation Data, with no segmentation masks
+    hdf5_file.create_dataset("validation_data", config['val_shape'], np.float32)
+    hdf5_file.create_dataset("validation_data_pat_name", (config['val_shape'][0],), dtype="S100")
 
     for dataset_splits in glob.glob(os.path.join(config['data_dir_prefix'], '*')): # Training/Validation data?
         if os.path.isdir(dataset_splits) and 'Validation' in dataset_splits: # make sure its a directory
