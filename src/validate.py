@@ -4,8 +4,8 @@ from modules.training_helpers import *
 import cPickle as pickle
 import numpy as np
 import random as random
-random.seed(1337)
-np.random.seed(1337)
+random.seed(config['seed'])
+np.random.seed(config['seed'])
 import importlib
 import optparse
 import os
@@ -48,6 +48,16 @@ parser.add_option('--mn', '--model-name',
 
 
 options, remainder = parser.parse_args()
+
+# ---------------------------------------------------------------------
+# SET PARAMETERS HERE
+# ---------------------------------------------------------------------
+# set the model name to load here
+options.defmodelfile = "isensee"
+options.grade = "Combined"
+options.model_name = "/home/anmol/mounts/cedar-rm/scratch/asa224/model-checkpoints/BRATS_E135--0.77.h5"
+options.validate_on = "2018"
+# ---------------------------------------------------------------------
 
 if options.defmodelfile is None:
     logger.info('No defmodel file name defined, using default model (cnn)')

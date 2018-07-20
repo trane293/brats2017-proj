@@ -65,7 +65,7 @@ config['seed'] = 1338
 config['data_order'] = 'th' # what order should the indices be to store in hdf5 file
 config['train_hgg_patients'] = 210 # number of HGG patients in training
 config['train_lgg_patients'] = 75 # number of LGG patients in training
-config['validation_patients'] = 47 # number of patients in validation
+config['validation_patients'] = 66 # number of patients in validation
 
 config['batch_size'] = 1 # how many images to load at once in the generator
 
