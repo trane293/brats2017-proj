@@ -172,11 +172,10 @@ def create_context_module(input_layer, n_level_filters, dropout_rate=0.3, data_f
     return convolution2
 
 def custom_loss(n_labels=3):
-
     lab_names = {
-        0: 'Necrotic',
-        1: 'Edema',
-        2: 'Enhancing'
+        0: 'Whole_Tumor',
+        1: 'Enhancing',
+        2: 'Tumor_Core'
     }
 
     label_wise_dice_metrics = [get_label_dice_coefficient_function(index, name) for index, name in

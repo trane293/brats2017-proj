@@ -11,6 +11,8 @@ import optparse
 import os
 import logging
 from modules.training_helpers import standardize
+import SimpleITK as sitk
+import shutil
 
 logging.basicConfig(level=logging.DEBUG)
 try:
@@ -55,7 +57,7 @@ options, remainder = parser.parse_args()
 # set the model name to load here
 options.defmodelfile = "isensee"
 options.grade = "Combined"
-options.model_name = "/home/anmol/mounts/cedar-rm/scratch/asa224/model-checkpoints/BRATS_E135--0.77.h5"
+options.model_name = "/home/anmol/mounts/cedar-rm/scratch/asa224/model-staging/BRATS_E160--0.78.h5"
 options.validate_on = "2018"
 # ---------------------------------------------------------------------
 
@@ -91,13 +93,20 @@ else:
 
 # get the validation data
 validation_data = hdf5_file_g['validation_data']
-
+validation_data_pat_name = hdf5_file_g['validation_data_pat_name']
 
 # ------------------------------------------------------------------------------------
 # create new HDF5 file to hold prediction data
 # ------------------------------------------------------------------------------------
 logger.info('Creating new HDF5 dataset to hold prediction data')
 pred_filename = os.path.join(config['model_prediction_location'], 'model_predictions_' + options.model_name.split('/')[-1])
+pred_nii_folder = '.'.join(pred_filename.split('.')[0:-1])
+if os.path.isdir(pred_nii_folder):
+    x = raw_input('Prediction directory already exists, do you want to overwrite? (y,n)')
+    if x.lower() == 'y':
+        shutil.rmtree(pred_nii_folder)
+        os.makedirs(pred_nii_folder)
+
 new_hdf5 = h5py.File(pred_filename, mode='w')
 
 new_hdf5.create_dataset("validation_data", val_shape, np.float32)
@@ -117,6 +126,8 @@ custom_objs = modeldefmodule.custom_loss()
 model = modeldefmodule.open_model_with_hyper_and_history(name=options.model_name, custom_obj=custom_objs, load_model_only=True)
 # =====================================================================================
 
+# sample segmentation mask that comes with BRATS to  copy meta information from
+sample_img = sitk.ReadImage('/home/anmol/mounts/cedar-rm/scratch/asa224/Datasets/BRATS2018/Training/HGG/Brats18_2013_2_1/Brats18_2013_2_1_seg.nii.gz')
 # -------------------------------------------------------------------------------------
 # Open the data, standardize and prepare for prediction
 # -------------------------------------------------------------------------------------
@@ -125,6 +136,8 @@ logger.info('Looping over validation data for prediction')
 for i in range(0, validation_data.shape[0]):
     logger.debug('Indexing HDF5 datastore...')
     pat_volume = validation_data[i]
+    pat_name = validation_data_pat_name[i]
+
     logger.debug('Standardizing..')
     pat_volume = standardize(pat_volume, applyToTest=mean_var)
 
@@ -141,14 +154,53 @@ for i in range(0, validation_data.shape[0]):
     # predict using the whole volume
     pred = model.predict(new_pat_volume)
 
+    # sample for testing
+    # pred = np.ones((1, 3, 240, 240, 160))
     # get back the main volume and strip the padding
     pred = pred[:,:,:,:,0:155]
 
     assert pred.shape == (1,3,240,240,155)
 
+    # create SITK object
+    # Swap axes of the prediction
+    pred_sw = np.swapaxes(pred, 4, 3)
+    pred_sw = np.swapaxes(pred_sw, 3, 2)
+
+    np.shape(pred_sw)
+    mask_shape = np.shape(pred_sw)
+    main_mask = np.zeros((mask_shape[2], mask_shape[3], mask_shape[4]))
+
+    # now we need to build the mask as it came from the data
+    # edema = while tumor - tumor core (2)
+    # enhancing = enhancing (4)
+    # necrosis + non enhancing = tumor core - enhancing (1)
+    # for each index
+    # 0 = whole tumor (1 + 2 + 4)
+    # 1 = enhancing (4)
+    # 2 = tumor core (1 + 4)
+
+    edema_mask = pred_sw[0,0] - pred_sw[0,2] # WT - TC, 0 - 2
+    enhancing_mask = pred_sw[0,1]
+    nec_nh_mask = pred_sw[0,2] - pred_sw[0,1] # TC - EN
+
+    edema_mask[np.where(edema_mask > 0)] = 2
+    enhancing_mask[np.where(enhancing_mask) > 0] = 4
+    nec_nh_mask[np.where(nec_nh_mask) > 0] = 1
+
+    main_mask = edema_mask + enhancing_mask + nec_nh_mask
+
+    # assert np.max(np.unique(main_mask)) <= 4, 'Segmentation labels may be wrong!'
+
+    sitk_pred_img = sitk.GetImageFromArray(main_mask)
+    sitk_pred_img.CopyInformation(sample_img)
+
     logger.debug('Adding predicted volume to HDF5 store..')
     # we use the batch size = 1 for prediction, so the first one.
     new_hdf5['validation_data'][i] = pred[0]
+
+    logger.debug('Saving prediction as nii.gz file')
+    sitk.WriteImage(sitk_pred_img, os.path.join(pred_nii_folder, '{}.nii.gz'.format(pat_name)))
+
 # =====================================================================================
 
 new_hdf5.close()
