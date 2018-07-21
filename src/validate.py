@@ -57,7 +57,7 @@ options, remainder = parser.parse_args()
 # set the model name to load here
 options.defmodelfile = "isensee"
 options.grade = "Combined"
-options.model_name = "/home/anmol/mounts/cedar-rm/scratch/asa224/model-staging/BRATS_E160--0.78.h5"
+options.model_name = "/scratch/asa224/asa224/model-staging/BRATS_E160--0.78.h5"
 options.validate_on = "2018"
 # ---------------------------------------------------------------------
 
@@ -127,18 +127,19 @@ model = modeldefmodule.open_model_with_hyper_and_history(name=options.model_name
 # =====================================================================================
 
 # sample segmentation mask that comes with BRATS to  copy meta information from
-sample_img = sitk.ReadImage('/home/anmol/mounts/cedar-rm/scratch/asa224/Datasets/BRATS2018/Training/HGG/Brats18_2013_2_1/Brats18_2013_2_1_seg.nii.gz')
+sample_img = sitk.ReadImage('/scratch/asa224/asa224/Datasets/BRATS2018/Training/HGG/Brats18_2013_2_1/Brats18_2013_2_1_seg.nii.gz')
 # -------------------------------------------------------------------------------------
 # Open the data, standardize and prepare for prediction
 # -------------------------------------------------------------------------------------
 logger.info(validation_data.shape)
 logger.info('Looping over validation data for prediction')
 for i in range(0, validation_data.shape[0]):
-    logger.debug('Indexing HDF5 datastore...')
+    logger.info('Indexing HDF5 datastore...')
+    logger.info('Patient {}'.format(i))
     pat_volume = validation_data[i]
     pat_name = validation_data_pat_name[i]
 
-    logger.debug('Standardizing..')
+    logger.info('Standardizing..')
     pat_volume = standardize(pat_volume, applyToTest=mean_var)
 
     curr_shape = list(pat_volume.shape)
@@ -150,7 +151,7 @@ for i in range(0, validation_data.shape[0]):
     new_pat_volume = np.zeros((1, 4, 240, 240, 160))
     new_pat_volume[:, :, :, :, 0:155] = pat_volume
 
-    logger.debug('Starting prediction..')
+    logger.info('Starting prediction..')
     # predict using the whole volume
     pred = model.predict(new_pat_volume)
 
@@ -194,11 +195,11 @@ for i in range(0, validation_data.shape[0]):
     sitk_pred_img = sitk.GetImageFromArray(main_mask)
     sitk_pred_img.CopyInformation(sample_img)
 
-    logger.debug('Adding predicted volume to HDF5 store..')
+    logger.info('Adding predicted volume to HDF5 store..')
     # we use the batch size = 1 for prediction, so the first one.
     new_hdf5['validation_data'][i] = pred[0]
 
-    logger.debug('Saving prediction as nii.gz file')
+    logger.info('Saving prediction as nii.gz file')
     sitk.WriteImage(sitk_pred_img, os.path.join(pred_nii_folder, '{}.nii.gz'.format(pat_name)))
 
 # =====================================================================================
