@@ -166,7 +166,7 @@ for i in range(0, validation_data.shape[0]):
     pred_sw = np.swapaxes(pred, 4, 3)
     pred_sw = np.swapaxes(pred_sw, 3, 2)
 
-    pred_sw = pred_sw > 0.5
+    pred_sw = pred_sw > 0.2
     pred_sw = pred_sw.astype(np.uint16)
 
     mask_shape = np.shape(pred_sw)
@@ -181,15 +181,13 @@ for i in range(0, validation_data.shape[0]):
     # 1 = enhancing (4)
     # 2 = tumor core (1 + 4)
 
-    edema_mask = pred_sw[0,0] - pred_sw[0,2] # WT - TC, 0 - 2
-    enhancing_mask = pred_sw[0,1]
-    nec_nh_mask = pred_sw[0,2] - pred_sw[0,1] # TC - EN
+    edema_mask = np.clip(pred_sw[0,0] - pred_sw[0,2], 0, 1) # WT - TC, 0 - 2
+    enhancing_mask = np.clip(pred_sw[0,1], 0, 1)
+    nec_nh_mask = np.clip(pred_sw[0,2] - pred_sw[0,1], 0, 1) # TC - EN
 
-    edema_mask[np.where(edema_mask > 0)] = 2
-    enhancing_mask[np.where(enhancing_mask) > 0] = 4
-    nec_nh_mask[np.where(nec_nh_mask) > 0] = 1
-
-    main_mask = edema_mask + enhancing_mask + nec_nh_mask
+    main_mask[np.where(edema_mask == 1)] = 2
+    main_mask[np.where(enhancing_mask == 1)] = 4
+    main_mask[np.where(nec_nh_mask == 1)] = 1
 
     # assert np.max(np.unique(main_mask)) <= 4, 'Segmentation labels may be wrong!'
 
