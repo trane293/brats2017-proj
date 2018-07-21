@@ -57,7 +57,7 @@ options, remainder = parser.parse_args()
 # set the model name to load here
 options.defmodelfile = "isensee"
 options.grade = "Combined"
-options.model_name = "/scratch/asa224/asa224/model-staging/BRATS_E160--0.78.h5"
+options.model_name = "/home/anmol/mounts/cedar-rm/scratch/asa224/model-staging/BRATS_E160--0.78.h5"
 options.validate_on = "2018"
 # ---------------------------------------------------------------------
 
@@ -127,7 +127,7 @@ model = modeldefmodule.open_model_with_hyper_and_history(name=options.model_name
 # =====================================================================================
 
 # sample segmentation mask that comes with BRATS to  copy meta information from
-sample_img = sitk.ReadImage('/scratch/asa224/asa224/Datasets/BRATS2018/Training/HGG/Brats18_2013_2_1/Brats18_2013_2_1_seg.nii.gz')
+sample_img = sitk.ReadImage('/home/anmol/mounts/cedar-rm/scratch/asa224/Datasets/BRATS2018/Training/HGG/Brats18_2013_2_1/Brats18_2013_2_1_seg.nii.gz')
 # -------------------------------------------------------------------------------------
 # Open the data, standardize and prepare for prediction
 # -------------------------------------------------------------------------------------
