@@ -166,7 +166,9 @@ for i in range(0, validation_data.shape[0]):
     pred_sw = np.swapaxes(pred, 4, 3)
     pred_sw = np.swapaxes(pred_sw, 3, 2)
 
-    np.shape(pred_sw)
+    pred_sw = pred_sw > 0.5
+    pred_sw = pred_sw.astype(np.uint16)
+
     mask_shape = np.shape(pred_sw)
     main_mask = np.zeros((mask_shape[2], mask_shape[3], mask_shape[4]))
 
