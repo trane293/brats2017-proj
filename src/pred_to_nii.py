@@ -1,14 +1,21 @@
 import h5py, os
-from modules.configfile import config, mount_path_prefix
+from modules.configfile import config
 import numpy as np
 import random as random
 random.seed(config['seed'])
 np.random.seed(config['seed'])
 import shutil
 import SimpleITK as sitk
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+try:
+    logger = logging.getLogger(__file__.split('/')[-1])
+except:
+    logger = logging.getLogger(__name__)
 
 # Open the prediction HDF5 file
-print('Opening prediction HDF5 dataset that holds prediction data')
+logger.info('Opening prediction HDF5 dataset that holds prediction data')
 model_name = 'BRATS_E160--0.78.h5'
 pred_filename = os.path.join(config['model_prediction_location'], 'model_predictions_' + model_name)
 pred_nii_folder = '.'.join(pred_filename.split('.')[0:-1])
@@ -17,16 +24,24 @@ if os.path.isdir(pred_nii_folder):
     if x.lower() == 'y':
         shutil.rmtree(pred_nii_folder)
         os.makedirs(pred_nii_folder)
+    else:
+        os.exit(-1)
+else:
+    os.makedirs(pred_nii_folder)
 
 h5_file = h5py.File(pred_filename, mode='r')
 data = h5_file['validation_data']
 names = h5_file['validation_data_pat_name']
 
+logger.info('Opening sample file from Training dataset')
 sample_img = sitk.ReadImage('/home/anmol/mounts/cedar-rm/scratch/asa224/Datasets/BRATS2018/Training/HGG/Brats18_2013_2_1/Brats18_2013_2_1_seg.nii.gz')
 
 for i in range(data.shape[0]):
+    logger.info('Patient {}'.format(i))
     pred = data[i]
     pat_name = names[i]
+
+    pred = np.expand_dims(pred, axis=0)
 
     # create SITK object
     # Swap axes of the prediction
@@ -61,5 +76,5 @@ for i in range(data.shape[0]):
     sitk_pred_img = sitk.GetImageFromArray(main_mask)
     sitk_pred_img.CopyInformation(sample_img)
 
-    print('Saving prediction as nii.gz file')
+    logger.info('Saving prediction as nii.gz file')
     sitk.WriteImage(sitk_pred_img, os.path.join(pred_nii_folder, '{}.nii.gz'.format(pat_name)))

@@ -106,6 +106,10 @@ if os.path.isdir(pred_nii_folder):
     if x.lower() == 'y':
         shutil.rmtree(pred_nii_folder)
         os.makedirs(pred_nii_folder)
+    else:
+        os.exit(-1)
+else:
+    os.makedirs(pred_nii_folder)
 
 new_hdf5 = h5py.File(pred_filename, mode='w')
 
