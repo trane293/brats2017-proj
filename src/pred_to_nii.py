@@ -1,5 +1,5 @@
 import h5py, os
-from modules.configfile import config
+from modules.configfile import config, mount_path_prefix
 import numpy as np
 import random as random
 random.seed(config['seed'])
@@ -34,7 +34,7 @@ data = h5_file['validation_data']
 names = h5_file['validation_data_pat_name']
 
 logger.info('Opening sample file from Training dataset')
-sample_img = sitk.ReadImage('/home/anmol/mounts/cedar-rm/scratch/asa224/Datasets/BRATS2018/Training/HGG/Brats18_2013_2_1/Brats18_2013_2_1_seg.nii.gz')
+sample_img = sitk.ReadImage(os.path.join(mount_path_prefix, 'scratch/asa224/Datasets/BRATS2018/Training/HGG/Brats18_2013_2_1/Brats18_2013_2_1_seg.nii.gz'))
 
 for i in range(data.shape[0]):
     logger.info('Patient {}'.format(i))

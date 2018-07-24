@@ -131,7 +131,7 @@ model = modeldefmodule.open_model_with_hyper_and_history(name=options.model_name
 # =====================================================================================
 
 # sample segmentation mask that comes with BRATS to  copy meta information from
-sample_img = sitk.ReadImage('/home/anmol/mounts/cedar-rm/scratch/asa224/Datasets/BRATS2018/Training/HGG/Brats18_2013_2_1/Brats18_2013_2_1_seg.nii.gz')
+sample_img = sitk.ReadImage(os.path.join(mount_path_prefix, 'scratch/asa224/Datasets/BRATS2018/Training/HGG/Brats18_2013_2_1/Brats18_2013_2_1_seg.nii.gz'))
 # -------------------------------------------------------------------------------------
 # Open the data, standardize and prepare for prediction
 # -------------------------------------------------------------------------------------
