@@ -57,7 +57,7 @@ options, remainder = parser.parse_args()
 # set the model name to load here
 options.defmodelfile = "isensee"
 options.grade = "Combined"
-options.model_name = os.path.join(mount_path_prefix, "scratch/asa224/model-staging/BRATS_E2_WITH_PERMUTE_BLUR_AFFINE.h5")
+options.model_name = os.path.join(mount_path_prefix, "scratch/asa224/model-staging/BRATS_E3_WITH_PERMUTE_BLUR_AFFINE_REMOVE_SEQ.h5")
 options.validate_on = "2018"
 # ---------------------------------------------------------------------
 
