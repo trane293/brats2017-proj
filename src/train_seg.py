@@ -229,6 +229,9 @@ if options.affine:
     logger.info('Running training with add_affine=True')
     augment.append('affine')
 
+logger.info("The following data augmentation processes will be applied: ")
+logger.info(augment)
+
 if augment == []:
     # no data augmentation to be used
     augment = None
