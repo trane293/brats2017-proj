@@ -199,9 +199,16 @@ def generate_patches(X, Y, t_i, mean_var, debug_mode=False, gen_name='Training',
                 # not all proposals will be valid, hence keep generating patch coordinates until you find a valid one
                 while k is not None:
 
-                    # randomly sample cube center coordinates from multivariate gaussian
-                    xc, yc, zc = np.random.multivariate_normal(mean=com,
-                                                               cov=np.diag(np.array(std) * std_scale))
+                    if epoch_count > 50:
+                        # randomly sample cube center coordinates from multivariate gaussian
+                        xc, yc, zc = np.random.multivariate_normal(mean=com,
+                                                                   cov=np.diag(np.array(std) * std_scale))
+                    else:
+                        # randomly sample cube center coordinates from multivariate gaussian
+                        com = [120, 120, 78] # center of the volume
+                        std = [95, 75, 75] # half of [190, 150, 150], which is approximately taken from  crop coordinates
+                        xc, yc, zc = np.random.multivariate_normal(mean=com,
+                                                                   cov=np.diag(np.array(std) * std_scale))
                     xmin = int(xc) - (patch_size_x / 2)
                     xmax = int(xc) + (patch_size_x / 2)
 

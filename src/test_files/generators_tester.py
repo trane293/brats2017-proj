@@ -79,7 +79,7 @@ train_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
                                    applyNorm=False, augment=augment)
 
 test_gen = generate_patch_batches(X=training_data, Y=training_data_segmasks,
-                                  t_i=test_indices, mean_var=mean_var, batch_size=batch_size, debug_mode=False,
+                                  t_i=test_indices, mean_var=mean_var, batch_size=batch_size, debug_mode=True,
                                   applyNorm=False, augment=augment)
 
 count = 0
