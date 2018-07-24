@@ -48,8 +48,8 @@ from modules.training_helpers import *
 import cPickle as pickle
 import numpy as np
 import random as random
-random.seed(1337)
-np.random.seed(1337)
+random.seed(config['seed'])
+np.random.seed(config['seed'])
 import importlib
 import optparse
 import os

@@ -6,6 +6,8 @@ import logging
 import cPickle as pickle
 from augment import augment_data
 import platform, random
+np.random.seed(config['seed'])
+random.seed(config['seed'])
 
 # to make the code portable even on cedar,you need to add conditions here
 node_name = platform.node()
