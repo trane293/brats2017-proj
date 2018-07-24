@@ -211,7 +211,7 @@ total_per_epoch_testing = (len(test_indices) * config['num_patches_per_patient']
 augment = []
 if options.permute != False:
     logger.info('Running training with permute=True')
-    augment.append('remove_seq')
+    augment.append('permute')
 
 if options.remove_seq != False:
     logger.info('Running training with remove_sequence=True')
